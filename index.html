@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>K.'s Recipes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; height: 100%; background: #1C2321; overflow: hidden; }
+  body { font-family: 'Archivo', -apple-system, sans-serif; }
+
+  #app { width: 100%; height: 100%; position: relative; overflow: hidden; }
+  .screen { position: absolute; inset: 0; display: flex; flex-direction: column; overflow: hidden; }
+  .hidden { display: none !important; }
+
+  /* ---------- LIST SCREEN ---------- */
+  #screen-list { background: #F4EFE4; }
+  .list-header { padding: 34px 24px 20px; background: #1C2321; color: #F4EFE4; flex-shrink: 0; }
+  .list-header-mark {
+    width: 38px; height: 38px; border-radius: 10px; background: #E8B339; color: #1C2321;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 14px; font-size: 19px;
+  }
+  .list-header h1 { font-family: 'Archivo Expanded', sans-serif; font-weight: 800; font-size: 28px; letter-spacing: -0.02em; margin: 0 0 4px; }
+  .list-header p { margin: 0; font-size: 13.5px; color: rgba(244,239,228,0.6); font-weight: 500; }
+  .list-body { flex: 1; overflow-y: auto; padding: 18px 16px 32px; -webkit-overflow-scrolling: touch; }
+  .day-group { margin-bottom: 22px; }
+  .day-label { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #8A7F68; padding: 0 6px 10px; }
+  .recipe-row {
+    width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: #FFFDF8; border: 1px solid #E7DFCC; border-radius: 14px; padding: 16px; margin-bottom: 8px;
+    text-align: left; cursor: pointer; font-family: inherit; transition: transform 0.1s ease;
+  }
+  .recipe-row:active { transform: scale(0.98); background: #FBF6EA; }
+  .recipe-row-title { font-weight: 700; font-size: 15.5px; color: #1C2321; line-height: 1.25; margin-bottom: 3px; }
+  .recipe-row-subtitle { font-size: 12.5px; color: #8A7F68; font-weight: 500; }
+  .recipe-row-meta {
+    display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: #B5793A;
+    flex-shrink: 0; background: #F4E9D2; padding: 5px 9px; border-radius: 20px; white-space: nowrap;
+  }
+
+  /* ---------- OVERVIEW SCREEN ---------- */
+  #screen-overview { background: #FFFDF8; }
+  .overview-topbar { padding: 18px 16px 0; flex-shrink: 0; }
+  .icon-btn {
+    width: 38px; height: 38px; border-radius: 50%; border: none; background: #EFE8D8; color: #1C2321;
+    display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px;
+  }
+  .icon-btn.on-dark { background: rgba(255,255,255,0.12); color: #F4EFE4; }
+  .overview-hero { padding: 16px 24px 22px; border-bottom: 1px solid #EFE7D5; flex-shrink: 0; }
+  .overview-day { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #B5793A; margin-bottom: 8px; }
+  .overview-hero h1 { font-family: 'Archivo Expanded', sans-serif; font-weight: 800; font-size: 25px; line-height: 1.15; letter-spacing: -0.01em; color: #1C2321; margin: 0 0 6px; }
+  .overview-subtitle { font-size: 13.5px; color: #8A7F68; font-weight: 500; margin: 0 0 16px; }
+  .overview-stats { display: flex; gap: 18px; }
+  .stat { display: flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 600; color: #4A453C; }
+  .overview-body { flex: 1; overflow-y: auto; padding: 20px 24px 12px; -webkit-overflow-scrolling: touch; }
+  .overview-section { margin-bottom: 26px; }
+  .section-heading { font-family: 'Archivo Expanded', sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: #1C2321; margin: 0; }
+  .section-heading-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .tools-wrap { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+  .tool-chip { font-size: 12.5px; font-weight: 600; color: #4A453C; background: #F0EADB; border-radius: 20px; padding: 6px 12px; }
+  .cart-btn {
+    display: flex; align-items: center; gap: 6px; border: none; background: #1C2321; color: #F4EFE4;
+    font-size: 12px; font-weight: 700; padding: 9px 13px; border-radius: 20px; cursor: pointer; flex-shrink: 0; font-family: inherit;
+  }
+  .ingredient-list { list-style: none; margin: 0; padding: 0; }
+  .ingredient-row {
+    width: 100%; display: flex; align-items: center; gap: 12px; background: none; border: none;
+    border-bottom: 1px solid #F0EADB; padding: 13px 2px; text-align: left; cursor: pointer; font-family: inherit;
+  }
+  .check-box {
+    width: 21px; height: 21px; border-radius: 6px; border: 1.8px solid #C9BEA2; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; color: #FFFDF8; font-size: 12px; font-weight: 700;
+  }
+  .ingredient-row.checked .check-box { background: #E8B339; border-color: #E8B339; }
+  .ingredient-text { font-size: 14.5px; font-weight: 500; color: #1C2321; line-height: 1.35; }
+  .ingredient-row.checked .ingredient-text { color: #A39C89; text-decoration: line-through; }
+  .all-set-note { margin-top: 12px; font-size: 12.5px; font-weight: 600; color: #7A9A6E; display: none; }
+  .overview-footer { flex-shrink: 0; padding: 14px 24px 22px; background: linear-gradient(to top, #FFFDF8 60%, rgba(255,253,248,0)); }
+  .start-btn {
+    width: 100%; border: none; background: #E8B339; color: #1C2321; font-family: 'Archivo Expanded', sans-serif;
+    font-weight: 800; font-size: 16px; letter-spacing: -0.01em; padding: 17px; border-radius: 16px; cursor: pointer;
+  }
+  .start-btn:active { background: #D9A52D; }
+
+  /* ---------- COOK SCREEN ---------- */
+  #screen-cook { background: #1C2321; color: #F4EFE4; cursor: pointer; user-select: none; }
+  .cook-topbar { display: flex; align-items: center; justify-content: space-between; padding: 18px 16px 0; flex-shrink: 0; }
+  .cook-title { font-size: 12.5px; font-weight: 600; color: rgba(244,239,228,0.55); max-width: 55%; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cook-step-count { font-size: 12.5px; font-weight: 700; color: #E8B339; font-variant-numeric: tabular-nums; min-width: 38px; text-align: right; }
+  .cook-progress { display: flex; gap: 5px; padding: 16px 16px 0; flex-shrink: 0; }
+  .progress-dot { flex: 1; height: 4px; border-radius: 3px; background: rgba(244,239,228,0.14); }
+  .progress-dot.filled { background: #E8B339; }
+  .cook-body { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 24px 30px; overflow-y: auto; }
+  .cook-step-label { font-family: 'Archivo Expanded', sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: #E8B339; margin-bottom: 14px; }
+  .cook-step-title { font-family: 'Archivo Expanded', sans-serif; font-weight: 800; font-size: 34px; line-height: 1.08; letter-spacing: -0.01em; margin: 0 0 22px; }
+  .cook-step-text { font-size: 19px; line-height: 1.55; font-weight: 500; color: rgba(244,239,228,0.92); margin: 0 0 20px; }
+  .cook-step-note { font-size: 14.5px; line-height: 1.5; font-weight: 500; color: rgba(244,239,228,0.68); background: rgba(244,239,228,0.06); border-left: 3px solid #E8B339; border-radius: 4px; padding: 12px 14px; display: none; }
+  .note-mark { display: block; font-family: 'Archivo Expanded', sans-serif; font-weight: 700; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; color: #E8B339; margin-bottom: 5px; }
+  .cook-footer { flex-shrink: 0; padding: 0 30px 30px; text-align: center; }
+  .tap-hint { font-size: 12px; font-weight: 600; color: rgba(244,239,228,0.4); letter-spacing: 0.02em; }
+
+  /* ---------- DONE SCREEN ---------- */
+  #screen-done { background: #1C2321; color: #F4EFE4; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; cursor: pointer; }
+  .done-mark { width: 64px; height: 64px; border-radius: 50%; background: #E8B339; color: #1C2321; display: flex; align-items: center; justify-content: center; margin-bottom: 22px; font-size: 30px; font-weight: 700; }
+  #screen-done h1 { font-family: 'Archivo Expanded', sans-serif; font-weight: 800; font-size: 28px; margin: 0 0 8px; }
+  #screen-done p { font-size: 15px; color: rgba(244,239,228,0.65); font-weight: 500; margin: 0 0 40px; }
+
+  /* ---------- KROGER SHEET ---------- */
+  .scrim { position: absolute; inset: 0; background: rgba(28,35,33,0.55); opacity: 0; pointer-events: none; transition: opacity 0.22s ease; z-index: 40; }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+  .sheet {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 50;
+    background: #FFFDF8; border-radius: 22px 22px 0 0; max-height: 86%;
+    display: flex; flex-direction: column;
+    transform: translateY(101%); transition: transform 0.28s cubic-bezier(0.32,0.72,0,1);
+    box-shadow: 0 -8px 40px rgba(28,35,33,0.22);
+  }
+  .sheet.open { transform: translateY(0); }
+  .sheet-grip { width: 38px; height: 4px; border-radius: 3px; background: #DDD3BC; margin: 10px auto 0; flex-shrink: 0; }
+  .sheet-head { padding: 14px 24px 14px; border-bottom: 1px solid #F0EADB; flex-shrink: 0; }
+  .sheet-head h2 { font-family: 'Archivo Expanded', sans-serif; font-weight: 800; font-size: 19px; letter-spacing: -0.01em; color: #1C2321; margin: 0 0 5px; }
+  .sheet-head p { margin: 0; font-size: 13px; line-height: 1.45; color: #8A7F68; font-weight: 500; }
+  .sheet-body { flex: 1; overflow-y: auto; padding: 8px 16px 4px; -webkit-overflow-scrolling: touch; }
+  .shop-link {
+    display: flex; align-items: center; gap: 12px; text-decoration: none;
+    padding: 14px 10px; border-bottom: 1px solid #F4EEE0;
+  }
+  .shop-link:active { background: #FBF6EA; }
+  .shop-num {
+    flex-shrink: 0; width: 24px; height: 24px; border-radius: 7px; background: #F4E9D2; color: #B5793A;
+    font-size: 11.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums;
+  }
+  .shop-text { flex: 1; min-width: 0; }
+  .shop-term { font-size: 14.5px; font-weight: 600; color: #1C2321; line-height: 1.3; }
+  .shop-raw { font-size: 11.5px; font-weight: 500; color: #A8A08C; margin-top: 2px; }
+  .shop-go { flex-shrink: 0; font-size: 14px; color: #C9BEA2; }
+  .staple-head {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em;
+    color: #A8A08C; padding: 18px 10px 8px;
+  }
+  .staple-row { display: flex; align-items: center; gap: 12px; padding: 9px 10px; font-size: 13.5px; font-weight: 500; color: #A8A08C; }
+  .staple-dot { width: 5px; height: 5px; border-radius: 50%; background: #DDD3BC; flex-shrink: 0; margin-left: 9px; }
+  .sheet-foot { flex-shrink: 0; padding: 12px 20px 22px; border-top: 1px solid #F0EADB; display: flex; gap: 9px; }
+  .sheet-btn {
+    flex: 1; border: none; font-family: inherit; font-size: 13.5px; font-weight: 700;
+    padding: 14px; border-radius: 13px; cursor: pointer;
+  }
+  .sheet-btn.ghost { background: #F0EADB; color: #4A453C; }
+  .sheet-btn.solid { background: #1C2321; color: #F4EFE4; }
+  .sheet-btn:active { opacity: 0.75; }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- SCREEN 1: RECIPE LIST -->
+  <div id="screen-list" class="screen">
+    <header class="list-header">
+      <div class="list-header-mark">&#127860;</div>
+      <h1>K.'s Recipes</h1>
+      <p>18 dinners &middot; tap one to start</p>
+    </header>
+    <div class="list-body" id="list-body"></div>
+  </div>
+
+  <!-- SCREEN 2: RECIPE OVERVIEW -->
+  <div id="screen-overview" class="screen hidden">
+    <div class="overview-topbar">
+      <button class="icon-btn" onclick="goToList()">&#8592;</button>
+    </div>
+    <div class="overview-hero">
+      <div class="overview-day" id="ov-day"></div>
+      <h1 id="ov-title"></h1>
+      <p class="overview-subtitle" id="ov-subtitle"></p>
+      <div class="overview-stats">
+        <div class="stat">&#9200; <span id="ov-time"></span></div>
+        <div class="stat">&#128101; <span id="ov-servings"></span></div>
+        <div class="stat">&#128293; <span id="ov-steps"></span></div>
+      </div>
+    </div>
+    <div class="overview-body">
+      <section class="overview-section">
+        <div class="section-heading">Tools</div>
+        <div class="tools-wrap" id="ov-tools"></div>
+      </section>
+      <section class="overview-section">
+        <div class="section-heading-row">
+          <div class="section-heading">Ingredients</div>
+          <button class="cart-btn" onclick="addToKrogerList()">&#128722; Add to Kroger list</button>
+        </div>
+        <ul class="ingredient-list" id="ov-ingredients"></ul>
+        <div class="all-set-note" id="ov-allset">Cart's ready &mdash; everything's checked off.</div>
+      </section>
+    </div>
+    <div class="overview-footer">
+      <button class="start-btn" onclick="startCooking()">Start cooking</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: COOK MODE -->
+  <div id="screen-cook" class="screen hidden" onclick="advanceStep()">
+    <div class="cook-topbar">
+      <button class="icon-btn on-dark" onclick="event.stopPropagation(); goBackStep()">&#8592;</button>
+      <div class="cook-title" id="cook-title"></div>
+      <div class="cook-step-count" id="cook-count"></div>
+    </div>
+    <div class="cook-progress" id="cook-progress"></div>
+    <div class="cook-body">
+      <div class="cook-step-label" id="cook-step-label"></div>
+      <h1 class="cook-step-title" id="cook-step-title"></h1>
+      <p class="cook-step-text" id="cook-step-text"></p>
+      <div class="cook-step-note" id="cook-step-note">
+        <span class="note-mark">Tip</span>
+        <span id="cook-step-note-text"></span>
+      </div>
+    </div>
+    <div class="cook-footer">
+      <div class="tap-hint" id="cook-tap-hint">Tap anywhere to continue</div>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: DONE -->
+  <div id="screen-done" class="screen hidden" onclick="goToList()">
+    <div class="done-mark">&#10003;</div>
+    <h1>Order up.</h1>
+    <p id="done-text"></p>
+    <div class="tap-hint">Tap to go back to recipes</div>
+  </div>
+
+  <!-- KROGER SHEET -->
+  <div class="scrim" id="kroger-scrim" onclick="closeKroger()"></div>
+  <div class="sheet" id="kroger-sheet">
+    <div class="sheet-grip"></div>
+    <div class="sheet-head">
+      <h2>Shop this recipe</h2>
+      <p>Each item opens a Kroger search. Add it to your cart there, then come back for the next one.</p>
+    </div>
+    <div class="sheet-body" id="kroger-body"></div>
+    <div class="sheet-foot">
+      <button class="sheet-btn ghost" onclick="copyShoppingList()" id="kroger-copy">Copy list</button>
+      <button class="sheet-btn solid" onclick="closeKroger()">Done</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* =================================================================
+   DATA
+================================================================= */
+const RECIPES = [
+  { id: "blackened-pork", day: "Saturday, June 27", title: "Blackened Pork + Roasted Carrots",
+    subtitle: "Pan-seared, oven-finished, dairy-free", time: "35 min", servings: 2,
+    tools: ["Oven","Sheet pan","Skillet","Tongs","Paper towels","Cutting board","Instant-read thermometer"],
+    ingredients: ["Pork tenderloin, 1\u20131.25 lb","Rainbow baby carrots, 1 lb bag","Sugar snap peas, 8 oz","Cajun's Choice or Zatarain's Blackened Seasoning","Cooking oil","Salt & pepper"],
+    steps: [
+      { title:"Preheat", body:"Preheat the oven to 425\u00b0F." },
+      { title:"Dry & season", body:"Pat the pork completely dry. Season with salt and pepper, then coat generously with blackening seasoning, pressing it on." },
+      { title:"Sear", body:"Heat 1 tsp oil over med-high until shimmering. Sear the pork 2\u20133 minutes per side, undisturbed.", note:"Deep mahogany is correct. Acrid smoke means turn the heat down." },
+      { title:"Roast", body:"Transfer to a sheet pan and roast to 140\u00b0F internal, about 20\u201325 minutes." },
+      { title:"Rest", body:"Rest 5 minutes, then slice into \u00bd-inch pieces.", note:"Carryover carries it to 145\u00b0F while it rests." },
+      { title:"Carrots", body:"Toss carrots with 1 tbsp oil, salt, pepper. Roast 15 minutes, flip, roast 10\u201315 minutes more until tender with browned edges." },
+      { title:"Snap peas", body:"Heat 1 tsp oil over med-high. Cook the snap peas with salt and pepper 3\u20135 minutes, stirring occasionally." },
+      { title:"Serve", body:"Plate half the pork with the vegetables. Save the rest for lunch tomorrow." }
+    ]},
+  { id: "ribeye-mushroom", day: "Saturday, June 27", title: "Ribeye with Mushroom Pan Sauce",
+    subtitle: "Cast iron sear, dairy-free finish", time: "20 min", servings: 2,
+    tools: ["Microwave","Skillet (cast iron ideal)","Tongs","Paper towels","Cutting board","Instant-read thermometer"],
+    ingredients: ["Ribeye steak, one 10\u201312 oz, ~1 inch thick","Russet potatoes, 2 medium","Baby bella mushrooms, 8 oz","Plant butter, 1 tbsp (optional)","Cooking oil","Salt & pepper","Water or stock"],
+    steps: [
+      { title:"Potatoes", body:"Pierce each russet 4\u20135 times with a fork. Microwave 6\u20138 minutes, flipping halfway. Cut in half." },
+      { title:"Dry the steak", body:"Pat the steak very dry, season with salt and pepper.", note:"A dry surface is the largest single factor in crust formation." },
+      { title:"Sear", body:"Heat 1 tbsp oil over med-high until it shimmers and barely wisps smoke. Sear to 125\u00b0F for medium-rare or 135\u00b0F for medium \u2014 about 3\u20134 minutes per side." },
+      { title:"Render the edge", body:"Stand the steak on its fat edge with tongs, 1 minute, to render it crisp." },
+      { title:"Rest & slice", body:"Rest 5 minutes, then slice against the grain." },
+      { title:"Mushrooms", body:"Wipe mushrooms clean, slice thin. In the same skillet over medium-high, add 2 tsp oil and the mushrooms. Undisturbed 3 minutes, then saut\u00e9 3\u20134 minutes." },
+      { title:"Pan sauce", body:"Add 2 tbsp water, boil, scrape the brown bits loose, cook 2 minutes.", note:"For a real sauce: use \u00bc cup stock instead of water, reduce by half, then off heat swirl in 1 tbsp cold plant butter." },
+      { title:"Serve", body:"Plate the steak and potatoes, spoon the mushroom sauce over." }
+    ]},
+  { id: "beef-tacos-cheddar", day: "Saturday, June 27", title: "Ground Beef Tacos, Dairy-Free Cheddar",
+    subtitle: "Almond flour tortillas", time: "10 min", servings: 2,
+    tools: ["Skillet","Microwave","Paper towel"],
+    ingredients: ["Simple Truth 85/15 Ground Beef, \u00bd lb","Mission Almond Flour Tortilla Wraps, 4","Dairy-free cheddar shreds, \u00bd cup","Old El Paso Taco Seasoning, \u00bd packet","Cooking oil","Salt & pepper","Lime"],
+    steps: [
+      { title:"Sear", body:"Heat a skillet over high with \u00bd tsp oil. Add the beef, break into large chunks, sear undisturbed 2 minutes." },
+      { title:"Bloom the seasoning", body:"Flip, break into small pieces, push meat to one side. Add \u00bd the seasoning packet to the bare hot fat for 20\u201330 seconds until fragrant, then stir through.", note:"This makes the spice taste roasted instead of dusty." },
+      { title:"Finish the beef", body:"Cook 2\u20133 minutes to 160\u00b0F. Drain the rendered fat." },
+      { title:"Warm tortillas", body:"Stack all 4, wrap in a damp paper towel, microwave 15\u201330 seconds." },
+      { title:"Assemble", body:"Lay 2 tbsp cheese on each warm tortilla first, then spoon the hot beef over it so it melts." },
+      { title:"Finish", body:"Squeeze lime over the finished tacos." }
+    ]},
+  { id: "ravioli-caesar", day: "Saturday, June 27", title: "Ravioli with Marinara + Caesar Salad",
+    subtitle: "Dairy-free filled pasta", time: "12 min", servings: 2,
+    tools: ["Large pot","Colander","Large bowl"],
+    ingredients: ["Kite Hill Dairy-Free Ravioli, 9 oz (or potato gnocchi, 16 oz)","Rao's Homemade Marinara, 1 jar","Romaine hearts, 2","Vegan Caesar dressing","Croutons, ~1 cup","Salt"],
+    steps: [
+      { title:"Boil water", body:"Boil a large pot of well-salted water \u2014 it should taste like a light broth." },
+      { title:"Cook pasta", body:"Cook the ravioli or gnocchi to package time. Reserve \u00bd cup of pasta water before draining. Don't rinse." },
+      { title:"Sauce", body:"Return pasta to the pot with the sauce, 1\u20132 minutes until hot, loosening with pasta water as needed.", note:"A glug of olive oil and a pinch of red pepper flakes upgrades jarred sauce a lot." },
+      { title:"Salad", body:"Chop the romaine, dress, add croutons, toss right before serving." },
+      { title:"Serve", body:"Divide ravioli and salad between plates." }
+    ]},
+  { id: "bang-chicken-tacos", day: "Friday, July 3", title: "Bang Chicken Tacos",
+    subtitle: "Sweet chili lime", time: "25 min", servings: 2,
+    tools: ["Oven","Sheet pan","Skillet"],
+    ingredients: ["Tyson or Perdue Breaded Chicken Nuggets, ~12 oz","Kroger Soft Taco Flour Tortillas, 4","Kroger Broccoli Slaw, 2 cups","Lime, 1","Mae Ploy Sweet Chili Sauce, 2 tbsp","Mayonnaise, 1 tbsp"],
+    steps: [
+      { title:"Preheat", body:"Preheat the oven to 400\u00b0F with the sheet pan inside it." },
+      { title:"Bake, round 1", body:"Arrange the nuggets with space between them. Bake 10 minutes." },
+      { title:"Bake, round 2", body:"Flip, bake 12\u201315 minutes more, to golden and 165\u00b0F internal." },
+      { title:"Sauce", body:"Mix 1 tbsp mayo + 2 tbsp sweet chili sauce + a squeeze of lime + pinch of salt." },
+      { title:"Warm tortillas", body:"Wrap all 4 in foil and put them in the oven for the last 5 minutes of the bake." },
+      { title:"Assemble", body:"Divide the chicken among tortillas, add slaw, drizzle sauce, serve with lime wedges." }
+    ]},
+  { id: "turkey-meatloaf", day: "Friday, July 3", title: "Turkey Meatloaf + Sweet Potato",
+    subtitle: "From pre-made or from scratch", time: "25\u201350 min", servings: 2,
+    tools: ["Oven","Baking dish","Microwave"],
+    ingredients: ["Pre-made turkey meatloaf, or 1 lb ground turkey + \u2153 cup Rao's Marinara","Sweet potatoes, 2 medium","Plant butter (optional)","Salt & pepper"],
+    steps: [
+      { title:"Preheat", body:"Preheat the oven to 400\u00b0F." },
+      { title:"Meatloaf", body:"Pre-made: bake 20\u201325 minutes to 165\u00b0F. From scratch: shape seasoned ground turkey into a loaf, top with sauce, bake 35\u201340 minutes to 165\u00b0F.", note:"Cover with foil for the first two-thirds so the edges don't dry." },
+      { title:"Sweet potatoes", body:"Pierce, microwave on high 6\u20138 minutes, flipping halfway." },
+      { title:"Finish potatoes", body:"Cut in half \u2014 extremely hot \u2014 season with salt, pepper, and plant butter." },
+      { title:"Serve", body:"Slice the meatloaf into 2 pieces and plate with the sweet potato." }
+    ]},
+  { id: "lentil-chili-asparagus", day: "Friday, July 3", title: "Lentil Chili with Asparagus",
+    subtitle: "Quick stovetop dinner", time: "10 min", servings: 2,
+    tools: ["Saucepan","Skillet with lid"],
+    ingredients: ["Amy's Organic Lentil Chili, 2 cans","Asparagus, 1 bunch (~1 lb)","Cooking oil","Salt & pepper","Lemon"],
+    steps: [
+      { title:"Heat the chili", body:"Heat the chili in a saucepan over medium, stirring, 4\u20135 minutes." },
+      { title:"Trim asparagus", body:"Snap off the woody ends \u2014 hold each spear at both ends and bend, it breaks where the tender part begins." },
+      { title:"Saut\u00e9", body:"Heat 1 tbsp oil over med-high, saut\u00e9 the asparagus with salt and pepper." },
+      { title:"Steam", body:"Reduce to medium, add 2 tbsp water, cover, steam until bright green and tender.", note:"Scale to thickness: thin 2\u20133 min, medium 3\u20134, thick 5 min saut\u00e9, then 1\u20132 min steam." },
+      { title:"Serve", body:"Finish the asparagus with lemon zest and juice. Serve alongside the chili." }
+    ]},
+  { id: "honey-citrus-salad", day: "Friday, July 3", title: "Honey Citrus Salad, Bacon + Cheddar Beef",
+    subtitle: "Chopped salad kit", time: "10 min", servings: 2,
+    tools: ["Skillet","Large bowl"],
+    ingredients: ["Simple Truth 85/15 Ground Beef, \u00bd lb","Cooked bacon, 3\u20134 slices","Dairy-free cheddar shreds, \u00bc cup","Taylor Farms Honey Citrus Chopped Salad Kit"],
+    steps: [
+      { title:"Sear", body:"Heat a lightly oiled skillet over high. Add the beef, break into large chunks, sear undisturbed 2 minutes." },
+      { title:"Finish beef", body:"Keep breaking it up, cook 3\u20135 minutes more to 160\u00b0F. Stir in the crumbled bacon at the end." },
+      { title:"Cheese off-heat", body:"Take the pan off the heat before adding the dairy-free cheese, or scatter it over the assembled salad instead.", note:"Dairy-free shreds can turn oily in a screaming-hot pan." },
+      { title:"Cool & assemble", body:"Drain the fat, let the beef cool 2 minutes, then add to the dressed salad." }
+    ]},
+  { id: "street-corn-salad", day: "Friday, July 3", title: "Street Corn Salad with BBQ Beef",
+    subtitle: "Chopped salad kit", time: "10 min", servings: 2,
+    tools: ["Skillet","Large bowl"],
+    ingredients: ["Simple Truth 85/15 Ground Beef, \u00bd lb","Sweet Baby Ray's BBQ Sauce, 1\u20132 tbsp","Taylor Farms Mexican Street Corn Chopped Salad Kit","Lime"],
+    steps: [
+      { title:"Sear", body:"Heat a lightly oiled skillet over high. Add the beef, break into large chunks, sear undisturbed 2 minutes." },
+      { title:"Finish beef", body:"Keep breaking it up, cook 3\u20135 minutes more to 160\u00b0F. Stir in the BBQ sauce in the last minute." },
+      { title:"Assemble", body:"Toss the salad kit with dressing, top with the beef.", note:"Extra lime and a pinch of Taj\u00edn sharpen the whole bowl." }
+    ]},
+  { id: "dill-hamburger", day: "Friday, July 3", title: "Creamy Dill Hamburger",
+    subtitle: "Dairy-free ranch base", time: "10 min", servings: 2,
+    tools: ["Skillet"],
+    ingredients: ["Simple Truth 85/15 Ground Beef Patties, 2","Kroger Hamburger Buns, 2","Follow Your Heart Dairy Free Vegan Ranch, 3 tbsp","Chopped dill pickle, 1 tbsp","Garlic powder"],
+    steps: [
+      { title:"Season & sear", body:"Heat a lightly oiled skillet over high. Season the patties right before they hit the pan." },
+      { title:"Cook", body:"Cook 2\u20133 minutes per side to 160\u00b0F. Don't press with the spatula." },
+      { title:"Toast buns", body:"Toast the buns cut-side down in the beef fat, 30 seconds." },
+      { title:"Sauce & assemble", body:"Mix the ranch with chopped dill pickle and a pinch of garlic powder. Assemble with sauce on both cut faces." }
+    ]},
+  { id: "grass-fed-burger-fries", day: "Saturday, July 11", title: "Grass-Fed Burger + Sweet Potato Fries",
+    subtitle: "Oven fries, seared patty", time: "30 min", servings: 2,
+    tools: ["Oven","Sheet pan","Skillet"],
+    ingredients: ["Simple Truth 85/15 Ground Beef Patties, 2","Sweet potatoes, 2 medium","Kroger Hamburger Buns, 2","McCormick Garlic & Herb Seasoning, 1 tsp","Cooking oil","Cornstarch, 1 tbsp (optional)","Salt & pepper"],
+    steps: [
+      { title:"Preheat", body:"Preheat the oven to 425\u00b0F with the sheet pan inside it." },
+      { title:"Cut fries", body:"Peel and cut sweet potatoes into \u00bd-inch thick, 3-inch sticks, as uniform as possible." },
+      { title:"Season fries", body:"Toss with 1 tbsp oil, salt, pepper, and 1 tbsp cornstarch. Spread in a single layer on the hot pan. No parchment." },
+      { title:"Bake, round 1", body:"Bake 15 minutes." },
+      { title:"Bake, round 2 + burgers", body:"Turn the fries, bake 10\u201315 minutes more. Meanwhile heat a lightly oiled skillet over medium-high." },
+      { title:"Cook burgers", body:"Season with garlic-herb blend, salt, pepper. Cook 3\u20134 minutes per side to 160\u00b0F." },
+      { title:"Serve", body:"Toast the buns in the pan, salt the fries the moment they're out of the oven, and assemble." }
+    ]},
+  { id: "green-chile-enchiladas", day: "Saturday, July 11", title: "Green Chile Chicken Enchiladas",
+    subtitle: "Dairy-free sour cream", time: "24 min", servings: 2,
+    tools: ["Oven","Small baking dish","Skillet"],
+    ingredients: ["Simple Truth Pulled Roasted Chicken, ~10 oz","Old El Paso Chopped Green Chiles, two 4 oz cans","Mission or Kroger Flour Tortillas, 4","Kite Hill Dairy Free Sour Cream, ~\u00bd cup","Cooking oil"],
+    steps: [
+      { title:"Preheat", body:"Preheat the oven to 400\u00b0F." },
+      { title:"Char the chile", body:"Drain the chiles and char them briefly in a dry skillet over high heat, 1\u20132 minutes.", note:"Canned chiles are watery straight from the can \u2014 this concentrates them." },
+      { title:"Filling", body:"Break the chicken into bite-size pieces, mix with 4 tbsp chile, season." },
+      { title:"Warm tortillas", body:"Warm the tortillas 30 seconds each, or wrap the stack in foil in the oven for 5 minutes while it preheats." },
+      { title:"Assemble", body:"Spread 2\u20133 tbsp chile across the bottom of an oiled baking dish. Roll the filled tortillas, lay seam side down. Drizzle remaining chile on top." },
+      { title:"Bake, covered", body:"Cover with foil, bake 10 minutes." },
+      { title:"Bake, uncovered", body:"Uncover, bake 10 minutes more until hot and bubbling." },
+      { title:"Serve", body:"Serve with 1\u20132 tbsp cold dairy-free sour cream per enchilada." }
+    ]},
+  { id: "zesty-beef-tacos-pico", day: "Saturday, July 11", title: "Zesty Beef Tacos with Pico de Gallo",
+    subtitle: "Corn tortillas", time: "10 min", servings: 2,
+    tools: ["Skillet","Salad spinner (optional)"],
+    ingredients: ["Simple Truth 85/15 Ground Beef Patties, 2","Kroger or Guerrero Corn Tortillas, 4","Old El Paso Taco Seasoning, 1 full packet","Fresh Cravings Pico de Gallo, ~\u00bd cup","Romaine heart, 1"],
+    steps: [
+      { title:"Prep romaine", body:"Wash the romaine leaves whole and dry thoroughly, then shred.", note:"Wash before shredding, not after, or water gets trapped in every strand." },
+      { title:"Sear", body:"Heat \u00bd tsp oil over high. Add the beef, break into large chunks, sear undisturbed 2 minutes." },
+      { title:"Bloom & finish", body:"Flip, break into small pieces, bloom the full seasoning packet in the hot fat for 20\u201330 seconds, then stir through. Cook 2\u20133 minutes to 160\u00b0F." },
+      { title:"Warm tortillas", body:"Warm the tortillas 30 seconds each in the beef pan." },
+      { title:"Assemble", body:"Build with beef, drained pico, and romaine." }
+    ]},
+  { id: "smoked-salmon-broccolini", day: "Saturday, July 11", title: "Smoked Salmon + Baby Broccoli",
+    subtitle: "No-cook salmon, saut\u00e9ed broccolini", time: "15 min", servings: 2,
+    tools: ["Microwave-safe bowl","Skillet with lid"],
+    ingredients: ["Smoked salmon, ~8 oz","Creamer potatoes, 1 lb","Broccolini, 1 bunch (~8 oz)","Cooking oil","Garlic powder","Salt & pepper","Lemon"],
+    steps: [
+      { title:"Salmon", body:"Split the salmon into halves or bite-size pieces.", note:"Cold-smoked should stay cold. Hot-smoked can be served warm or at room temp." },
+      { title:"Potatoes", body:"In a covered microwave-safe bowl, microwave 3 minutes, stir, microwave 2\u20134 minutes more, rest 2\u20133 minutes." },
+      { title:"Season potatoes", body:"Mix in salt, pepper, garlic powder, and 1 tbsp oil while still hot." },
+      { title:"Broccolini", body:"1 tbsp oil over med-high, cook 2\u20133 minutes to get real color on the stems." },
+      { title:"Steam", body:"Add 2\u20133 tbsp water, cover, steam ~2 minutes to tender-crisp and still vividly green." },
+      { title:"Serve", body:"Plate everything, finish with lemon and red pepper flakes." }
+    ]},
+  { id: "air-fryer-shrimp-tacos", day: "Saturday, July 18", title: "Air Fryer Crispy Shrimp Tacos",
+    subtitle: "Cornstarch coating", time: "15 min", servings: 2,
+    tools: ["Air fryer","Bowl"],
+    ingredients: ["Raw shrimp, 12 oz, peeled and deveined","Kroger or Mission Corn Tortillas, 4","Kroger Broccoli Slaw, 2 cups","Avocado, 1","Mae Ploy Sweet Chili Sauce, ~3 tbsp","Cornstarch, 2\u20133 tbsp","Cooking oil","Salt & pepper","Lime"],
+    steps: [
+      { title:"Check the avocado", body:"The avocado must be ripe. Firm avocado ripens in a paper bag in 1\u20132 days." },
+      { title:"Dry the shrimp", body:"Pat the shrimp very dry. Season, then toss with 2\u20133 tbsp cornstarch and shake off the excess." },
+      { title:"Preheat air fryer", body:"Coat the shrimp with 2 tsp oil. Preheat the air fryer to 400\u00b0F." },
+      { title:"Air fry", body:"Single layer with space between pieces, air fry 5 minutes, flipping halfway.", note:"Done when opaque and curled into a loose C." },
+      { title:"Assemble", body:"Warm the tortillas, assemble with shrimp, avocado, and slaw, drizzle with sweet chili sauce cut with lime juice." }
+    ]},
+  { id: "beef-guac-burger-fries", day: "Saturday, July 18", title: "Beef Guac Burger + Sweet Potato Fries",
+    subtitle: "Guac goes under the patty", time: "30 min", servings: 2,
+    tools: ["Oven","Sheet pan","Skillet"],
+    ingredients: ["Simple Truth 85/15 Ground Beef Patties, 2","Sweet potato, 1 large","Kroger Hamburger Buns, 2","Wholly Guacamole Classic Mild, 2\u20134 tbsp","Cooking oil","Cornstarch, 1 tbsp (optional)","Salt & pepper","Lime"],
+    steps: [
+      { title:"Fries", body:"425\u00b0F, preheated pan, \u00bd-inch \u00d7 3-inch sticks, oil and cornstarch, single layer." },
+      { title:"Bake fries", body:"15 minutes, turn, 10\u201315 more. Salt immediately out of the oven." },
+      { title:"Burgers", body:"Medium-high, 3\u20134 minutes per side to 160\u00b0F. Toast the buns in the pan after." },
+      { title:"Assemble", body:"Put the guacamole on the bottom bun, under the patty, 1\u20132 tbsp per burger.", note:"Heat dulls guac and it slides off the top." }
+    ]},
+  { id: "lemon-plant-butter-ravioli", day: "Saturday, July 18", title: "Lemon Plant-Butter Ravioli + Salad",
+    subtitle: "Toasted walnuts stand in for browned butter", time: "12 min", servings: 2,
+    tools: ["Large pot","Skillet"],
+    ingredients: ["Kite Hill Dairy-Free Ravioli, 9 oz (or potato gnocchi, 16 oz)","Plant butter, 2\u20134 tbsp","Lemon, 1","Walnuts, \u00bc cup (or plain breadcrumbs, 3 tbsp)","Kroger Sweet Kale Salad Kit","Salt & pepper"],
+    steps: [
+      { title:"Boil water", body:"Boil a large pot of salted water at a gentle simmer, not a hard rolling boil." },
+      { title:"Toast walnuts", body:"Toast the walnuts or breadcrumbs in a dry skillet over medium, 2\u20133 minutes, until fragrant. Set aside." },
+      { title:"Cook pasta", body:"Cook the ravioli to package time (usually 4\u20136 min). Reserve \u00bd cup pasta water." },
+      { title:"Melt butter", body:"In the same skillet, melt 2\u20134 tbsp plant butter over medium, about 1 minute \u2014 just until liquid." },
+      { title:"Combine", body:"Zest the lemon before juicing it. Add zest, juice, butter, toasted nuts, salt, and pepper to the pasta. Toss, loosening with pasta water." },
+      { title:"Salad", body:"Dress the kale salad kit and serve alongside." }
+    ]},
+  { id: "honey-mustard-chicken-sandwich", day: "Saturday, July 18", title: "Honey Mustard Chicken Sandwich",
+    subtitle: "3 servings", time: "20 min", servings: 3,
+    tools: ["Skillet","Instant-read thermometer"],
+    ingredients: ["Boneless skinless chicken breasts, 3 (~1.5 lb)","Buns, 3 (plain, not pretzel, for dairy-free)","Vlasic or Claussen Bread and Butter Pickle Slices","French's or Kroger Honey Mustard, ~\u00bd cup","Cooking oil","Salt & pepper"],
+    steps: [
+      { title:"Season", body:"Pat the chicken dry and season.", note:"Ten minutes in a salt-water brine (2 tbsp salt to 2 cups water) makes overcooking far more forgiving." },
+      { title:"Pound flat", body:"Pound to an even \u00be inch under plastic wrap, or butterfly them open." },
+      { title:"Cook", body:"Heat 2 tbsp oil over med-high. Cook 3\u20134 minutes per side to 165\u00b0F internal." },
+      { title:"Rest", body:"Rest 5 minutes. Toast the buns cut-side down in the chicken pan meanwhile." },
+      { title:"Assemble", body:"Sauce both cut faces of the bun, add chicken, top with pickles." }
+    ]}
+];
+
+/* =================================================================
+   STATE
+================================================================= */
+let activeRecipe = null;
+let stepIndex = 0;
+let checkedItems = {};
+
+/* =================================================================
+   RENDER: LIST
+================================================================= */
+function renderList() {
+  const body = document.getElementById('list-body');
+  const days = [...new Set(RECIPES.map(r => r.day))];
+  body.innerHTML = days.map(day => `
+    <div class="day-group">
+      <div class="day-label">${day}</div>
+      ${RECIPES.filter(r => r.day === day).map(r => `
+        <button class="recipe-row" onclick="openRecipe('${r.id}')">
+          <div>
+            <div class="recipe-row-title">${r.title}</div>
+            <div class="recipe-row-subtitle">${r.subtitle}</div>
+          </div>
+          <div class="recipe-row-meta">${r.time}</div>
+        </button>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function goToList() {
+  activeRecipe = null;
+  showScreen('screen-list');
+}
+
+/* =================================================================
+   RENDER: OVERVIEW
+================================================================= */
+function openRecipe(id) {
+  activeRecipe = RECIPES.find(r => r.id === id);
+  checkedItems = {};
+  document.getElementById('ov-day').textContent = activeRecipe.day;
+  document.getElementById('ov-title').textContent = activeRecipe.title;
+  document.getElementById('ov-subtitle').textContent = activeRecipe.subtitle;
+  document.getElementById('ov-time').textContent = activeRecipe.time;
+  document.getElementById('ov-servings').textContent = activeRecipe.servings + ' servings';
+  document.getElementById('ov-steps').textContent = activeRecipe.steps.length + ' steps';
+  document.getElementById('ov-tools').innerHTML = activeRecipe.tools.map(t => `<span class="tool-chip">${t}</span>`).join('');
+  renderIngredients();
+  showScreen('screen-overview');
+}
+
+function renderIngredients() {
+  const list = document.getElementById('ov-ingredients');
+  list.innerHTML = activeRecipe.ingredients.map((item, i) => `
+    <li>
+      <button class="ingredient-row ${checkedItems[i] ? 'checked' : ''}" onclick="toggleIngredient(${i})">
+        <span class="check-box">${checkedItems[i] ? '&#10003;' : ''}</span>
+        <span class="ingredient-text">${item}</span>
+      </button>
+    </li>
+  `).join('');
+  const allChecked = activeRecipe.ingredients.every((_, i) => checkedItems[i]);
+  document.getElementById('ov-allset').style.display = allChecked ? 'block' : 'none';
+}
+
+function toggleIngredient(i) {
+  checkedItems[i] = !checkedItems[i];
+  renderIngredients();
+}
+
+/* ---- Kroger shopping sheet ------------------------------------
+   Kroger has no public URL that accepts a list of items, so this
+   builds one search link per ingredient instead. The ingredient
+   strings carry quantities ("Ground Beef, 1/2 lb") which make poor
+   search terms, so searchTermFor() strips them back to the product.
+----------------------------------------------------------------- */
+
+const PANTRY = [
+  'cooking oil','oil','olive oil','salt','pepper','salt & pepper',
+  'water','water or stock','stock','garlic powder','salt for the water'
+];
+
+function searchTermFor(raw) {
+  let s = raw;
+  s = s.replace(/\([^)]*\)/g, ' ');          // drop parentheticals
+  s = s.split(',')[0];                        // quantities live after the comma
+  if (/\s+or\s+/i.test(s)) {                  // "A or B" -> keep the more specific side
+    s = s.split(/\s+or\s+/i)
+         .map(p => p.trim())
+         .reduce((a, b) => (b.length > a.length ? b : a));
+  }
+  s = s.replace(/^[\d\u00bd\u00bc\u00be\u2153\u2154\u2013\-\s]+/, '');  // leading counts
+  return s.replace(/\s+/g, ' ').trim();
+}
+
+function isPantry(raw, term) {
+  const a = raw.toLowerCase().trim(), b = term.toLowerCase().trim();
+  return PANTRY.includes(a) || PANTRY.includes(b);
+}
+
+function krogerUrl(term) {
+  return 'https://www.kroger.com/search?query=' + encodeURIComponent(term);
+}
+
+function addToKrogerList() {
+  const buy = [], staples = [];
+  activeRecipe.ingredients.forEach(raw => {
+    const term = searchTermFor(raw);
+    (isPantry(raw, term) ? staples : buy).push({ raw, term });
+  });
+
+  let html = buy.map((it, i) => `
+    <a class="shop-link" href="${krogerUrl(it.term)}" target="_blank" rel="noopener">
+      <span class="shop-num">${i + 1}</span>
+      <span class="shop-text">
+        <span class="shop-term">${it.term}</span>
+        ${it.raw !== it.term ? `<span class="shop-raw">${it.raw}</span>` : ''}
+      </span>
+      <span class="shop-go">&#8599;</span>
+    </a>
+  `).join('');
+
+  if (staples.length) {
+    html += `<div class="staple-head">Already in your kitchen</div>` +
+      staples.map(it => `
+        <div class="staple-row"><span class="staple-dot"></span>${it.raw}</div>
+      `).join('');
+  }
+
+  document.getElementById('kroger-body').innerHTML = html;
+  document.getElementById('kroger-body').scrollTop = 0;
+  document.getElementById('kroger-copy').textContent = 'Copy list';
+  document.getElementById('kroger-scrim').classList.add('open');
+  document.getElementById('kroger-sheet').classList.add('open');
+}
+
+function closeKroger() {
+  document.getElementById('kroger-scrim').classList.remove('open');
+  document.getElementById('kroger-sheet').classList.remove('open');
+}
+
+function copyShoppingList() {
+  const text = activeRecipe.title + '\n\n' +
+    activeRecipe.ingredients.map(i => '- ' + i).join('\n');
+  const btn = document.getElementById('kroger-copy');
+  const done = () => { btn.textContent = 'Copied'; setTimeout(() => { btn.textContent = 'Copy list'; }, 1600); };
+
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(done).catch(() => { btn.textContent = "Couldn't copy"; });
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); }
+    catch (e) { btn.textContent = "Couldn't copy"; }
+    document.body.removeChild(ta);
+  }
+}
+
+/* =================================================================
+   RENDER: COOK MODE
+================================================================= */
+function startCooking() {
+  stepIndex = 0;
+  showScreen('screen-cook');
+  renderStep();
+}
+
+function renderStep() {
+  const total = activeRecipe.steps.length;
+  const step = activeRecipe.steps[stepIndex];
+  document.getElementById('cook-title').textContent = activeRecipe.title;
+  document.getElementById('cook-count').textContent = (stepIndex + 1) + ' / ' + total;
+  document.getElementById('cook-step-label').textContent = 'Step ' + (stepIndex + 1);
+  document.getElementById('cook-step-title').textContent = step.title;
+  document.getElementById('cook-step-text').textContent = step.body;
+
+  const noteEl = document.getElementById('cook-step-note');
+  if (step.note) {
+    document.getElementById('cook-step-note-text').textContent = step.note;
+    noteEl.style.display = 'block';
+  } else {
+    noteEl.style.display = 'none';
+  }
+
+  document.getElementById('cook-progress').innerHTML = activeRecipe.steps.map((_, i) =>
+    `<div class="progress-dot ${i <= stepIndex ? 'filled' : ''}"></div>`
+  ).join('');
+
+  document.getElementById('cook-tap-hint').textContent =
+    (stepIndex === total - 1) ? 'Tap to finish' : 'Tap anywhere to continue';
+
+  document.getElementById('screen-cook').scrollTop = 0;
+}
+
+function advanceStep() {
+  const total = activeRecipe.steps.length;
+  if (stepIndex < total - 1) {
+    stepIndex++;
+    renderStep();
+  } else {
+    finishCooking();
+  }
+}
+
+function goBackStep() {
+  if (stepIndex > 0) {
+    stepIndex--;
+    renderStep();
+  } else {
+    showScreen('screen-overview');
+  }
+}
+
+function finishCooking() {
+  document.getElementById('done-text').textContent = activeRecipe.title + ' \u2014 done.';
+  showScreen('screen-done');
+}
+
+/* =================================================================
+   SCREEN SWITCHING
+================================================================= */
+function showScreen(id) {
+  closeKroger();
+  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+renderList();
+</script>
+
+</body>
+</html>
