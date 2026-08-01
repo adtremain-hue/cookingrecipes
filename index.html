@@ -150,18 +150,135 @@
   .sheet-btn.ghost { background: #F0EADB; color: #4A453C; }
   .sheet-btn.solid { background: #1C2321; color: #F4EFE4; }
   .sheet-btn:active { opacity: 0.75; }
+
+  /* ---------- WELCOME SCREEN ---------- */
+  #screen-welcome { background: #1C2321; color: #F4EFE4; }
+  .welcome-body { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 30px 30px 10px; }
+  .welcome-mark {
+    width: 52px; height: 52px; border-radius: 14px; background: #E8B339; color: #1C2321;
+    display: flex; align-items: center; justify-content: center; font-size: 25px; margin-bottom: 26px;
+  }
+  .welcome-body h1 { font-family: 'Archivo Expanded', sans-serif; font-weight: 800; font-size: 32px; line-height: 1.14; letter-spacing: -0.015em; margin: 0 0 14px; }
+  .welcome-body p { font-size: 15.5px; line-height: 1.6; color: rgba(244,239,228,0.68); font-weight: 500; margin: 0 0 6px; max-width: 34ch; }
+  .welcome-stats { display: flex; gap: 22px; margin: 26px 0 4px; }
+  .welcome-stat-num { font-family: 'Archivo Expanded', sans-serif; font-weight: 800; font-size: 22px; color: #E8B339; line-height: 1; }
+  .welcome-stat-label { font-size: 11.5px; font-weight: 600; color: rgba(244,239,228,0.5); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 5px; }
+  .welcome-footer { flex-shrink: 0; padding: 14px 30px 26px; }
+  .welcome-go {
+    width: 100%; border: none; background: #E8B339; color: #1C2321; font-family: 'Archivo Expanded', sans-serif;
+    font-weight: 800; font-size: 16px; letter-spacing: -0.01em; padding: 17px; border-radius: 16px; cursor: pointer; margin-bottom: 14px;
+  }
+  .welcome-go:active { background: #D9A52D; }
+  .welcome-skip {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: none; border: none; font-family: inherit; font-size: 12.5px; font-weight: 600;
+    color: rgba(244,239,228,0.45); padding: 6px; width: 100%; cursor: pointer;
+  }
+  .welcome-skip .check-box { width: 16px; height: 16px; border-radius: 5px; border: 1.6px solid rgba(244,239,228,0.3); font-size: 10px; }
+  .welcome-skip.checked .check-box { background: #E8B339; border-color: #E8B339; color: #1C2321; }
+
+  /* ---------- LIST HEADER: add button ---------- */
+  .list-header-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .list-header-titles { flex: 1; min-width: 0; }
+  .add-recipe-btn {
+    flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; border: none;
+    background: #E8B339; color: #1C2321; font-size: 20px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; cursor: pointer; margin-top: 2px;
+  }
+  .add-recipe-btn:active { background: #D9A52D; }
+
+  /* ---------- ADD RECIPE SCREEN ---------- */
+  #screen-add { background: #FFFDF8; }
+  .add-topbar {
+    flex-shrink: 0; padding: 16px 16px; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #EFE7D5;
+  }
+  .add-topbar h2 { font-family: 'Archivo Expanded', sans-serif; font-weight: 800; font-size: 17px; color: #1C2321; margin: 0; }
+  .add-save-btn {
+    border: none; background: #1C2321; color: #F4EFE4; font-family: inherit; font-weight: 700; font-size: 13.5px;
+    padding: 10px 16px; border-radius: 12px; cursor: pointer;
+  }
+  .add-save-btn:active { opacity: 0.8; }
+  .add-body { flex: 1; overflow-y: auto; padding: 20px 20px 40px; -webkit-overflow-scrolling: touch; }
+  .field-group { margin-bottom: 22px; }
+  .field-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #8A7F68; margin-bottom: 8px; display: block; }
+  .field-hint { font-size: 12px; color: #A8A08C; font-weight: 500; margin: -4px 0 8px; }
+  .field-input, .field-textarea {
+    width: 100%; border: 1.5px solid #E7DFCC; border-radius: 12px; background: #FFFDF8;
+    padding: 13px 14px; font-family: inherit; font-size: 15px; color: #1C2321; font-weight: 500;
+  }
+  .field-input:focus, .field-textarea:focus { outline: none; border-color: #E8B339; }
+  .field-textarea { resize: vertical; min-height: 64px; line-height: 1.4; }
+  .field-row { display: flex; gap: 10px; }
+  .field-row .field-group { flex: 1; }
+  .dyn-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .dyn-row .field-input { flex: 1; }
+  .dyn-remove {
+    flex-shrink: 0; width: 34px; height: 34px; border-radius: 10px; border: none; background: #F4E9E1;
+    color: #B5793A; font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .step-card { border: 1.5px solid #E7DFCC; border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+  .step-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .step-card-label { font-size: 12px; font-weight: 700; color: #B5793A; text-transform: uppercase; letter-spacing: 0.06em; }
+  .step-card .field-group { margin-bottom: 10px; }
+  .step-card .field-group:last-child { margin-bottom: 0; }
+  .dyn-add {
+    width: 100%; border: 1.5px dashed #DDD3BC; background: none; border-radius: 12px; padding: 13px;
+    font-family: inherit; font-weight: 700; font-size: 13.5px; color: #8A7F68; cursor: pointer; margin-top: 4px;
+  }
+  .dyn-add:active { background: #F4EEE0; }
+  .add-error {
+    display: none; background: #F9E7E1; color: #A34A2E; font-size: 13px; font-weight: 600;
+    padding: 12px 14px; border-radius: 12px; margin-bottom: 18px;
+  }
+  .add-error.show { display: block; }
+  .delete-recipe-btn {
+    width: 100%; border: none; background: #F9E7E1; color: #A34A2E; font-family: inherit; font-weight: 700;
+    font-size: 13.5px; padding: 13px; border-radius: 13px; cursor: pointer; margin-top: 4px;
+  }
 </style>
 </head>
 <body>
 
 <div id="app">
 
+  <!-- SCREEN 0: WELCOME -->
+  <div id="screen-welcome" class="screen">
+    <div class="welcome-body">
+      <div class="welcome-mark">&#127860;</div>
+      <h1 id="welcome-title">K.'s Recipes</h1>
+      <p>A shared cookbook, built for cooking on your phone &mdash; not scrolling past ads to find one. Every recipe walks you through it step by step, and you can add your own.</p>
+      <div class="welcome-stats">
+        <div>
+          <div class="welcome-stat-num" id="welcome-count">18</div>
+          <div class="welcome-stat-label">Recipes</div>
+        </div>
+        <div>
+          <div class="welcome-stat-num">1</div>
+          <div class="welcome-stat-label">Tap to cook</div>
+        </div>
+      </div>
+    </div>
+    <div class="welcome-footer">
+      <button class="welcome-go" onclick="leaveWelcome()">Browse recipes</button>
+      <button class="welcome-skip" id="welcome-skip-btn" onclick="toggleSkipWelcome()">
+        <span class="check-box" id="welcome-skip-check"></span>
+        Skip this screen next time
+      </button>
+    </div>
+  </div>
+
   <!-- SCREEN 1: RECIPE LIST -->
-  <div id="screen-list" class="screen">
+  <div id="screen-list" class="screen hidden">
     <header class="list-header">
-      <div class="list-header-mark">&#127860;</div>
-      <h1>K.'s Recipes</h1>
-      <p>18 dinners &middot; tap one to start</p>
+      <div class="list-header-row">
+        <div class="list-header-titles">
+          <div class="list-header-mark">&#127860;</div>
+          <h1>K.'s Recipes</h1>
+          <p id="list-subtitle">18 dinners &middot; tap one to start</p>
+        </div>
+        <button class="add-recipe-btn" onclick="openAddRecipe()" aria-label="Add a recipe">+</button>
+      </div>
     </header>
     <div class="list-body" id="list-body"></div>
   </div>
@@ -197,6 +314,7 @@
     </div>
     <div class="overview-footer">
       <button class="start-btn" onclick="startCooking()">Start cooking</button>
+      <button class="delete-recipe-btn hidden" id="delete-recipe-btn" onclick="deleteCurrentRecipe()">Delete this recipe</button>
     </div>
   </div>
 
@@ -228,6 +346,63 @@
     <h1>Order up.</h1>
     <p id="done-text"></p>
     <div class="tap-hint">Tap to go back to recipes</div>
+  </div>
+
+  <!-- SCREEN 5: ADD RECIPE -->
+  <div id="screen-add" class="screen hidden">
+    <div class="add-topbar">
+      <button class="icon-btn" onclick="cancelAddRecipe()">&#8592;</button>
+      <h2 id="add-heading">Add a recipe</h2>
+      <button class="add-save-btn" onclick="saveRecipe()">Save</button>
+    </div>
+    <div class="add-body">
+      <div class="add-error" id="add-error"></div>
+
+      <div class="field-group">
+        <label class="field-label" for="f-title">Title</label>
+        <input class="field-input" id="f-title" type="text" placeholder="e.g. Garlic Butter Shrimp Pasta">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="f-subtitle">Subtitle</label>
+        <input class="field-input" id="f-subtitle" type="text" placeholder="e.g. Quick weeknight pasta">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="f-day">Day</label>
+        <div class="field-hint">Recipes are grouped by this on the list screen.</div>
+        <input class="field-input" id="f-day" type="text" placeholder="e.g. Saturday, August 8">
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label" for="f-time">Time</label>
+          <input class="field-input" id="f-time" type="text" placeholder="e.g. 20 min">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="f-servings">Servings</label>
+          <input class="field-input" id="f-servings" type="number" min="1" value="2">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="f-tools">Tools</label>
+        <div class="field-hint">Comma-separated &mdash; e.g. Skillet, Tongs, Cutting board</div>
+        <input class="field-input" id="f-tools" type="text" placeholder="Skillet, Tongs">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Ingredients</label>
+        <div id="ing-rows"></div>
+        <button class="dyn-add" onclick="addIngredientRow()">+ Add ingredient</button>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Steps</label>
+        <div id="step-rows"></div>
+        <button class="dyn-add" onclick="addStepRow()">+ Add step</button>
+      </div>
+    </div>
   </div>
 
   <!-- KROGER SHEET -->
@@ -463,36 +638,106 @@ const RECIPES = [
 ];
 
 /* =================================================================
+   PERSISTENCE — recipes added on this device, saved in localStorage.
+   The site has no backend, so these live only in this browser; they
+   won't show up for anyone else who opens the same link.
+================================================================= */
+const STORAGE_KEY = 'ksRecipes.userRecipes';
+const SKIP_WELCOME_KEY = 'ksRecipes.skipWelcome';
+
+function loadUserRecipes() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveUserRecipes(list) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function getAllRecipes() {
+  return RECIPES.concat(loadUserRecipes());
+}
+
+function isUserRecipeId(id) {
+  return id.indexOf('user-') === 0;
+}
+
+function esc(str) {
+  const div = document.createElement('div');
+  div.textContent = str == null ? '' : String(str);
+  return div.innerHTML;
+}
+
+/* =================================================================
    STATE
 ================================================================= */
 let activeRecipe = null;
 let stepIndex = 0;
 let checkedItems = {};
+let draftIngredients = [];
+let draftSteps = [];
+
+/* =================================================================
+   WELCOME SCREEN
+================================================================= */
+function initWelcome() {
+  document.getElementById('welcome-count').textContent = getAllRecipes().length;
+  const skip = localStorage.getItem(SKIP_WELCOME_KEY) === '1';
+  if (skip) {
+    renderList();
+    showScreen('screen-list');
+  } else {
+    showScreen('screen-welcome');
+  }
+}
+
+function leaveWelcome() {
+  renderList();
+  showScreen('screen-list');
+}
+
+function toggleSkipWelcome() {
+  const on = localStorage.getItem(SKIP_WELCOME_KEY) === '1';
+  localStorage.setItem(SKIP_WELCOME_KEY, on ? '0' : '1');
+  document.getElementById('welcome-skip-btn').classList.toggle('checked', !on);
+}
 
 /* =================================================================
    RENDER: LIST
 ================================================================= */
 function renderList() {
   const body = document.getElementById('list-body');
-  const days = [...new Set(RECIPES.map(r => r.day))];
+  const all = getAllRecipes();
+  const days = [...new Set(all.map(r => r.day))];
   body.innerHTML = days.map(day => `
     <div class="day-group">
-      <div class="day-label">${day}</div>
-      ${RECIPES.filter(r => r.day === day).map(r => `
+      <div class="day-label">${esc(day)}</div>
+      ${all.filter(r => r.day === day).map(r => `
         <button class="recipe-row" onclick="openRecipe('${r.id}')">
           <div>
-            <div class="recipe-row-title">${r.title}</div>
-            <div class="recipe-row-subtitle">${r.subtitle}</div>
+            <div class="recipe-row-title">${esc(r.title)}</div>
+            <div class="recipe-row-subtitle">${esc(r.subtitle)}</div>
           </div>
-          <div class="recipe-row-meta">${r.time}</div>
+          <div class="recipe-row-meta">${esc(r.time)}</div>
         </button>
       `).join('')}
     </div>
   `).join('');
+  document.getElementById('list-subtitle').textContent = all.length + ' dinner' + (all.length === 1 ? '' : 's') + ' \u00b7 tap one to start';
 }
 
 function goToList() {
   activeRecipe = null;
+  renderList();
   showScreen('screen-list');
 }
 
@@ -500,7 +745,8 @@ function goToList() {
    RENDER: OVERVIEW
 ================================================================= */
 function openRecipe(id) {
-  activeRecipe = RECIPES.find(r => r.id === id);
+  activeRecipe = getAllRecipes().find(r => r.id === id);
+  if (!activeRecipe) { goToList(); return; }
   checkedItems = {};
   document.getElementById('ov-day').textContent = activeRecipe.day;
   document.getElementById('ov-title').textContent = activeRecipe.title;
@@ -508,9 +754,18 @@ function openRecipe(id) {
   document.getElementById('ov-time').textContent = activeRecipe.time;
   document.getElementById('ov-servings').textContent = activeRecipe.servings + ' servings';
   document.getElementById('ov-steps').textContent = activeRecipe.steps.length + ' steps';
-  document.getElementById('ov-tools').innerHTML = activeRecipe.tools.map(t => `<span class="tool-chip">${t}</span>`).join('');
+  document.getElementById('ov-tools').innerHTML = activeRecipe.tools.map(t => `<span class="tool-chip">${esc(t)}</span>`).join('');
+  document.getElementById('delete-recipe-btn').classList.toggle('hidden', !isUserRecipeId(activeRecipe.id));
   renderIngredients();
   showScreen('screen-overview');
+}
+
+function deleteCurrentRecipe() {
+  if (!activeRecipe || !isUserRecipeId(activeRecipe.id)) return;
+  if (!confirm('Delete "' + activeRecipe.title + '"? This can\'t be undone.')) return;
+  const remaining = loadUserRecipes().filter(r => r.id !== activeRecipe.id);
+  saveUserRecipes(remaining);
+  goToList();
 }
 
 function renderIngredients() {
@@ -519,7 +774,7 @@ function renderIngredients() {
     <li>
       <button class="ingredient-row ${checkedItems[i] ? 'checked' : ''}" onclick="toggleIngredient(${i})">
         <span class="check-box">${checkedItems[i] ? '&#10003;' : ''}</span>
-        <span class="ingredient-text">${item}</span>
+        <span class="ingredient-text">${esc(item)}</span>
       </button>
     </li>
   `).join('');
@@ -577,8 +832,8 @@ function addToKrogerList() {
     <a class="shop-link" href="${krogerUrl(it.term)}" target="_blank" rel="noopener">
       <span class="shop-num">${i + 1}</span>
       <span class="shop-text">
-        <span class="shop-term">${it.term}</span>
-        ${it.raw !== it.term ? `<span class="shop-raw">${it.raw}</span>` : ''}
+        <span class="shop-term">${esc(it.term)}</span>
+        ${it.raw !== it.term ? `<span class="shop-raw">${esc(it.raw)}</span>` : ''}
       </span>
       <span class="shop-go">&#8599;</span>
     </a>
@@ -587,7 +842,7 @@ function addToKrogerList() {
   if (staples.length) {
     html += `<div class="staple-head">Already in your kitchen</div>` +
       staples.map(it => `
-        <div class="staple-row"><span class="staple-dot"></span>${it.raw}</div>
+        <div class="staple-row"><span class="staple-dot"></span>${esc(it.raw)}</div>
       `).join('');
   }
 
@@ -622,6 +877,131 @@ function copyShoppingList() {
     catch (e) { btn.textContent = "Couldn't copy"; }
     document.body.removeChild(ta);
   }
+}
+
+/* =================================================================
+   ADD A RECIPE
+   Builds an object in the exact shape RECIPES uses, so it renders
+   through the same overview and cook-mode screens as the built-ins.
+================================================================= */
+function openAddRecipe() {
+  document.getElementById('f-title').value = '';
+  document.getElementById('f-subtitle').value = '';
+  document.getElementById('f-day').value = '';
+  document.getElementById('f-time').value = '';
+  document.getElementById('f-servings').value = 2;
+  document.getElementById('f-tools').value = '';
+  document.getElementById('add-error').classList.remove('show');
+  draftIngredients = [''];
+  draftSteps = [{ title: '', body: '', note: '' }];
+  renderIngRows();
+  renderStepRows();
+  showScreen('screen-add');
+  document.getElementById('screen-add').scrollTop = 0;
+}
+
+function cancelAddRecipe() {
+  goToList();
+}
+
+function renderIngRows() {
+  document.getElementById('ing-rows').innerHTML = draftIngredients.map((val, i) => `
+    <div class="dyn-row">
+      <input class="field-input" type="text" placeholder="e.g. Garlic, 3 cloves"
+        value="${esc(val)}" oninput="draftIngredients[${i}]=this.value">
+      ${draftIngredients.length > 1 ? `<button class="dyn-remove" onclick="removeIngredientRow(${i})" aria-label="Remove">&#10005;</button>` : ''}
+    </div>
+  `).join('');
+}
+
+function addIngredientRow() {
+  draftIngredients.push('');
+  renderIngRows();
+}
+
+function removeIngredientRow(i) {
+  draftIngredients.splice(i, 1);
+  renderIngRows();
+}
+
+function renderStepRows() {
+  document.getElementById('step-rows').innerHTML = draftSteps.map((step, i) => `
+    <div class="step-card">
+      <div class="step-card-head">
+        <span class="step-card-label">Step ${i + 1}</span>
+        ${draftSteps.length > 1 ? `<button class="dyn-remove" onclick="removeStepRow(${i})" aria-label="Remove step">&#10005;</button>` : ''}
+      </div>
+      <div class="field-group">
+        <input class="field-input" type="text" placeholder="Short title, e.g. Sear the chicken"
+          value="${esc(step.title)}" oninput="draftSteps[${i}].title=this.value">
+      </div>
+      <div class="field-group">
+        <textarea class="field-textarea" placeholder="What to actually do in this step"
+          oninput="draftSteps[${i}].body=this.value">${esc(step.body)}</textarea>
+      </div>
+      <div class="field-group">
+        <input class="field-input" type="text" placeholder="Optional tip (shown as a callout)"
+          value="${esc(step.note)}" oninput="draftSteps[${i}].note=this.value">
+      </div>
+    </div>
+  `).join('');
+}
+
+function addStepRow() {
+  draftSteps.push({ title: '', body: '', note: '' });
+  renderStepRows();
+}
+
+function removeStepRow(i) {
+  draftSteps.splice(i, 1);
+  renderStepRows();
+}
+
+function slugify(str) {
+  return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
+}
+
+function showAddError(msg) {
+  const el = document.getElementById('add-error');
+  el.textContent = msg;
+  el.classList.add('show');
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function saveRecipe() {
+  const title = document.getElementById('f-title').value.trim();
+  const subtitle = document.getElementById('f-subtitle').value.trim();
+  const day = document.getElementById('f-day').value.trim() || 'Added recipes';
+  const time = document.getElementById('f-time').value.trim() || '\u2014';
+  const servings = parseInt(document.getElementById('f-servings').value, 10) || 2;
+  const tools = document.getElementById('f-tools').value.split(',').map(t => t.trim()).filter(Boolean);
+  const ingredients = draftIngredients.map(i => i.trim()).filter(Boolean);
+  const steps = draftSteps
+    .map(s => ({ title: s.title.trim(), body: s.body.trim(), note: s.note.trim() }))
+    .filter(s => s.title || s.body)
+    .map(s => s.note ? s : { title: s.title, body: s.body });
+
+  if (!title) return showAddError('Give the recipe a title.');
+  if (!ingredients.length) return showAddError('Add at least one ingredient.');
+  if (!steps.length) return showAddError('Add at least one step with a title or instructions.');
+
+  const existingIds = getAllRecipes().map(r => r.id);
+  let id = 'user-' + slugify(title);
+  if (!id || id === 'user-') id = 'user-recipe';
+  let unique = id, n = 2;
+  while (existingIds.includes(unique)) { unique = id + '-' + n; n++; }
+
+  const recipe = {
+    id: unique, day, title, subtitle: subtitle || (ingredients.length + ' ingredients'),
+    time, servings, tools, ingredients, steps
+  };
+
+  const list = loadUserRecipes();
+  list.push(recipe);
+  saveUserRecipes(list);
+
+  goToList();
+  openRecipe(unique);
 }
 
 /* =================================================================
@@ -693,7 +1073,8 @@ function showScreen(id) {
   document.getElementById(id).classList.remove('hidden');
 }
 
-renderList();
+document.getElementById('welcome-skip-btn').classList.toggle('checked', localStorage.getItem(SKIP_WELCOME_KEY) === '1');
+initWelcome();
 </script>
 
 </body>
