@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="recipe-app-version" content="1.2.0" />
 <title>K.'s Recipes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -275,7 +276,7 @@
         <div class="list-header-titles">
           <div class="list-header-mark">&#127860;</div>
           <h1>K.'s Recipes</h1>
-          <p id="list-subtitle">18 dinners &middot; tap one to start</p>
+          <p id="list-subtitle">tap one to start</p>
         </div>
         <button class="add-recipe-btn" onclick="openAddRecipe()" aria-label="Add a recipe">+</button>
       </div>
@@ -634,6 +635,22 @@ const RECIPES = [
       { title:"Cook", body:"Heat 2 tbsp oil over med-high. Cook 3\u20134 minutes per side to 165\u00b0F internal." },
       { title:"Rest", body:"Rest 5 minutes. Toast the buns cut-side down in the chicken pan meanwhile." },
       { title:"Assemble", body:"Sauce both cut faces of the bun, add chicken, top with pickles." }
+    ]},
+  { id: "sausage-penne-marinara", day: "Pantry & Weeknight", title: "Sausage Penne with Marinara",
+    subtitle: "Lovera\u2019s sausage, Ceriello marinara, dairy-free", time: "30 min", servings: 4,
+    tools: ["Large pot","Colander","Large skillet","Wooden spoon","Instant-read thermometer","Liquid measuring cup"],
+    ingredients: ["Italian Harvest Penne Rigate, 13 oz (\u00be of the 500g bag)","Ceriello Homestyle Marinara, one 15 oz jar","Lovera\u2019s Original Italian Sausage (Mild), 1 lb","Olive oil, 2 tbsp divided","Red pepper flakes, \u00bc tsp","Dried Italian herb blend, 1 tsp","Kosher salt, 1 tbsp for the pasta water","Grated Parmigiano Reggiano for the table (optional \u2014 contains dairy)"],
+    steps: [
+      { title:"Water on first", body:"Fill a large pot with about 4 quarts of water, cover, and set over high heat. Everything else happens while it climbs to a boil. Hold the salt until it\u2019s actually boiling." },
+      { title:"Prep the sausage", body:"If the sausage is in links, either slit the casings and squeeze the meat out, or slice into \u00bd-inch coins. Loose meat browns more and distributes better through the penne; coins look nicer." },
+      { title:"Sear undisturbed", body:"Heat 1 tbsp oil in a large skillet over medium-high. When it shimmers, add the sausage in a single layer and leave it alone for 3 full minutes.", note:"Stirring early gives you gray steamed pork instead of crust, and no fond in the pan for the sauce to pick up." },
+      { title:"Break it up and finish", body:"Stir, breaking the meat into bite-size pieces, and cook 3\u20134 minutes more until no pink remains. Check with a thermometer \u2014 you want 160\u00b0F.", note:"160\u00b0F is the USDA number for ground pork, higher than whole cuts, because grinding spreads surface bacteria through the meat. It can stay slightly pink at 160\u00b0F, so trust the thermometer over the color." },
+      { title:"Bloom the spices", body:"Push the meat to one side. Add the red pepper flakes and Italian herbs to the bare rendered fat and stir 20\u201330 seconds until they smell toasted, then stir everything together.", note:"The flavor compounds in dried herbs and chile flakes are fat-soluble. Thirty seconds in hot fat pulls far more out of them than ten minutes simmering in tomato." },
+      { title:"Sauce in, scrape, simmer", body:"Pour in the full jar of marinara and scrape every browned bit off the bottom with a wooden spoon. Drop to a low simmer for 10 minutes. Salt the pasta water now that it\u2019s boiling.", note:"Ten minutes of low simmer noticeably deepens jarred sauce and works the sausage fat into it. The scraping isn\u2019t optional \u2014 that fond is concentrated pork flavor." },
+      { title:"Cook the penne", body:"Add the penne to the boiling water and stir for the first 30 seconds so it doesn\u2019t clump. The bag says 12\u201314 minutes \u2014 start tasting at 9.", note:"You want it noticeably underdone, with a firm and faintly chalky center. It finishes in the pan." },
+      { title:"Save the water", body:"Before draining, dip a measuring cup into the pot and pull out a full cup of the cloudy pasta water. Set it beside the stove. Drain, and don\u2019t rinse.", note:"That starch is what makes the sauce cling instead of pool. Easiest step to forget, the one you\u2019ll miss most." },
+      { title:"Marry it in the pan", body:"Add the drained penne to the skillet with about \u00bd cup of the pasta water. Toss hard over medium heat 60\u201390 seconds until the sauce turns glossy and grips the ridges. Loosen with more water if it tightens." },
+      { title:"Finish and taste", body:"Off the heat, drizzle in the last 1 tbsp olive oil and toss once more. Taste and salt until it tastes like something. Pass the cheese separately.", note:"Keeping the cheese out of the pan keeps the pot dairy-free and saves anyone from fishing around it." }
     ]}
 ];
 
@@ -642,6 +659,7 @@ const RECIPES = [
    The site has no backend, so these live only in this browser; they
    won't show up for anyone else who opens the same link.
 ================================================================= */
+const APP_VERSION = document.querySelector('meta[name="recipe-app-version"]').content;
 const STORAGE_KEY = 'ksRecipes.userRecipes';
 const SKIP_WELCOME_KEY = 'ksRecipes.skipWelcome';
 
@@ -732,7 +750,7 @@ function renderList() {
       `).join('')}
     </div>
   `).join('');
-  document.getElementById('list-subtitle').textContent = all.length + ' dinner' + (all.length === 1 ? '' : 's') + ' \u00b7 tap one to start';
+  document.getElementById('list-subtitle').textContent = all.length + ' recipe' + (all.length === 1 ? '' : 's') + ' \u00b7 tap one to start \u00b7 v' + APP_VERSION;
 }
 
 function goToList() {
@@ -796,7 +814,8 @@ function toggleIngredient(i) {
 
 const PANTRY = [
   'cooking oil','oil','olive oil','salt','pepper','salt & pepper',
-  'water','water or stock','stock','garlic powder','salt for the water'
+  'water','water or stock','stock','garlic powder','salt for the water',
+  'kosher salt','red pepper flakes','dried italian herb blend','olive oil, 2 tbsp divided'
 ];
 
 function searchTermFor(raw) {
