@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<meta name="recipe-app-version" content="1.2.0" />
+<meta name="recipe-app-version" content="1.3.0" />
 <title>K.'s Recipes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -651,6 +651,25 @@ const RECIPES = [
       { title:"Save the water", body:"Before draining, dip a measuring cup into the pot and pull out a full cup of the cloudy pasta water. Set it beside the stove. Drain, and don\u2019t rinse.", note:"That starch is what makes the sauce cling instead of pool. Easiest step to forget, the one you\u2019ll miss most." },
       { title:"Marry it in the pan", body:"Add the drained penne to the skillet with about \u00bd cup of the pasta water. Toss hard over medium heat 60\u201390 seconds until the sauce turns glossy and grips the ridges. Loosen with more water if it tightens." },
       { title:"Finish and taste", body:"Off the heat, drizzle in the last 1 tbsp olive oil and toss once more. Taste and salt until it tastes like something. Pass the cheese separately.", note:"Keeping the cheese out of the pan keeps the pot dairy-free and saves anyone from fishing around it." }
+    ]},
+  { id: "dairy-free-choco-pistachio", day: "Bakes", title: "Dairy-Free Chocolate Pistachio Loaf",
+    subtitle: "Marble loaf, real pistachio, no dairy", time: "1 hr 30 min", servings: 8,
+    tools: ["Oven","9\u00d75 loaf pan","Stand mixer or hand mixer","2 large mixing bowls","Small bowl","Parchment paper","Wire rack","Butter knife or skewer","Food processor (only if grinding your own pistachios)"],
+    ingredients: ["Kroger All-Purpose Flour, 1\u00be cups","Kroger Baking Powder, 1 tsp","Kroger Baking Soda, \u00bd tsp","Salt, \u00be tsp","Kroger Corn Starch, 2 tbsp","Earth Balance Buttery Sticks, 1 cup (2 sticks, softened)","Kroger Granulated Sugar, 1\u00bc cups","Large eggs, 4 (room temperature)","Kroger Pure Vanilla Extract, \u00bd tsp","Kroger Pure Almond Extract, 1 tsp","Simple Truth Unsweetened Soy Milk, \u00be cup total","Kroger Apple Cider Vinegar, 1 tbsp","Pistachio butter, \u00bd cup (or 1 cup shelled roasted pistachios to grind)","Hershey\u2019s Special Dark Cocoa, 3 tbsp","Hot water, 2 tbsp (or brewed coffee)","Enjoy Life Dark Chocolate Morsels, 1 oz (about 2 tbsp), melted","Kroger Roasted Salted Pistachios, \u00bc cup, chopped, for the top","Green food coloring, 2\u20133 drops (optional)"],
+    steps: [
+      { title:"Pistachio butter", body:"If you bought pistachio butter, skip ahead. To make it: grind 1 cup shelled roasted salted pistachios in a food processor 5\u20138 minutes, scraping down often, until it turns from sand to a loose paste.", note:"It goes through a crumbly stage that looks like it will never come together. Keep going \u2014 the oil releases suddenly." },
+      { title:"Prep", body:"Preheat the oven to 350\u00b0F. Grease a 9\u00d75 loaf pan and line it with parchment, leaving overhang on the long sides so you can lift the loaf out. Set out the butter, eggs, and soy milk to come to room temperature." },
+      { title:"Sour the milk", body:"Stir 1 tbsp apple cider vinegar into \u00bd cup of the soy milk and let it sit while you work. Reserve the other \u00bc cup for the pistachio batter.", note:"This is the buttermilk stand-in. The acid also gives the baking soda something to react with." },
+      { title:"Cream", body:"Beat the plant butter and sugar 3\u20134 minutes until pale and fluffy, scraping the bowl once.", note:"Plant butter is softer than dairy butter at room temp. If it looks greasy rather than fluffy, chill the bowl 10 minutes and re-whip." },
+      { title:"Eggs and extracts", body:"Add the eggs one at a time, beating well after each. Beat in the vanilla and almond extracts." },
+      { title:"Dry ingredients", body:"In a separate bowl, whisk the flour, baking powder, baking soda, and salt together." },
+      { title:"Combine", body:"Add the dry mixture and the soured milk to the butter mixture in alternating additions, starting and ending with dry. Mix only until the last streaks disappear.", note:"Overmixing here is what turns a tender loaf into a tough one. Stop early." },
+      { title:"Pistachio half", body:"Divide the batter evenly between two bowls. Into the first, fold \u00bd cup pistachio butter, 2 tbsp corn starch, the reserved \u00bc cup soy milk, and the food coloring if using.", note:"The corn starch does the job instant pudding mix would have \u2014 it keeps the crumb soft and holds moisture. Pudding mix contains milk, so it is out." },
+      { title:"Chocolate half", body:"Whisk the cocoa with 2 tbsp hot water or coffee until glossy and lump-free, then stir in the melted chocolate. Fold this into the second bowl of batter.", note:"Blooming the cocoa in hot liquid is the difference between dusty and deep. Do not skip it." },
+      { title:"Layer", body:"Spoon \u2153 of the pistachio batter into the pan. Dollop half the chocolate batter over it. Repeat with another \u2153 pistachio, the rest of the chocolate, then the last of the pistachio." },
+      { title:"Swirl", body:"Drag a knife or skewer through the batter in 2\u20133 slow S-shapes. Stop there.", note:"Every extra pass blends the two batters toward brown. Under-swirling looks better than over-swirling." },
+      { title:"Top and bake", body:"Scatter the chopped pistachios over the top. Bake 55\u201365 minutes, until a skewer in the center comes out with moist crumbs but no wet batter.", note:"Tent loosely with foil around minute 40 if the top is darkening fast. Start checking at 50 \u2014 ovens vary more than recipes admit." },
+      { title:"Cool", body:"Cool in the pan 15 minutes, then lift it out by the parchment onto a wire rack and cool completely before slicing, about 45 minutes.", note:"Slicing warm will drag and compress the crumb. It is also better the next day, wrapped." }
     ]}
 ];
 
@@ -815,7 +834,8 @@ function toggleIngredient(i) {
 const PANTRY = [
   'cooking oil','oil','olive oil','salt','pepper','salt & pepper',
   'water','water or stock','stock','garlic powder','salt for the water',
-  'kosher salt','red pepper flakes','dried italian herb blend','olive oil, 2 tbsp divided'
+  'kosher salt','red pepper flakes','dried italian herb blend','olive oil, 2 tbsp divided',
+  'hot water','brewed coffee'
 ];
 
 function searchTermFor(raw) {
