@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<meta name="recipe-app-version" content="1.4.0" />
+<meta name="recipe-app-version" content="1.6.0" />
 <title>K.'s Recipes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -124,6 +124,12 @@
     font-size: 12px; font-weight: 600; color: #8A7F68; padding: 10px 10px 0;
   }
   .cart-status.error { color: #A34A2E; }
+
+  .cart-verify {
+    display: none; align-items: center; gap: 6px; margin-top: 8px;
+    font-size: 13px; font-weight: 700; color: #B5793A; text-decoration: none;
+  }
+  .cart-verify.show { display: inline-flex; }
 
   /* ---------- KROGER SHEET ---------- */
   .scrim { position: absolute; inset: 0; background: rgba(28,35,33,0.55); opacity: 0; pointer-events: none; transition: opacity 0.22s ease; z-index: 40; }
@@ -446,9 +452,12 @@
       <p>Each item opens a Kroger search. Add it to your cart there, then come back for the next one.</p>
     </div>
     <div class="sheet-body" id="kroger-body"></div>
+    <div class="cart-status" id="cart-status"></div>
+    <a class="cart-verify" id="cart-verify" href="https://www.kroger.com/cart" target="_blank" rel="noopener">Open my Kroger cart &#8599;</a>
     <div class="sheet-foot">
       <button class="sheet-btn ghost" onclick="copyShoppingList()" id="kroger-copy">Copy list</button>
-      <button class="sheet-btn solid" onclick="closeKroger()">Done</button>
+      <button class="sheet-btn solid hidden" onclick="sendToKrogerCart()" id="kroger-send">Send to cart</button>
+      <button class="sheet-btn solid" onclick="closeKroger()" id="kroger-done">Done</button>
     </div>
   </div>
 
@@ -1105,6 +1114,122 @@ function closePicker(finished) {
   if (finished && pickerDone) { const d = pickerDone; pickerDone = null; d(); }
 }
 
+
+/* =================================================================
+   KROGER CART
+   The token arrives in the URL fragment after sign-in. Fragments are
+   never sent to a server, so it is safe to read one there and clear it.
+
+   Note: Kroger's public API has no endpoint to read a cart back. The
+   app tracks what it sent, which is a record of this session's pushes,
+   not a mirror of the real cart. Anything changed on Kroger's site is
+   invisible here.
+================================================================= */
+
+const KROGER_TOKEN_KEY = 'ksRecipes.krogerToken';
+
+function readTokenFromHash() {
+  const m = location.hash.match(/kroger_token=([^&]+)/);
+  if (!m) return;
+  try { localStorage.setItem(KROGER_TOKEN_KEY, m[1]); } catch (e) {}
+  history.replaceState(null, '', location.pathname + location.search);
+}
+
+function krogerToken() {
+  try { return localStorage.getItem(KROGER_TOKEN_KEY); } catch (e) { return null; }
+}
+
+function krogerSignIn() {
+  location.href = WORKER_URL + '/login';
+}
+
+function cartStatus(msg, isError) {
+  const el = document.getElementById('cart-status');
+  el.textContent = msg || '';
+  el.classList.toggle('error', !!isError);
+}
+
+/* Shows the send button only when cart mode is actually usable. */
+function refreshCartButton() {
+  const send = document.getElementById('kroger-send');
+  const done = document.getElementById('kroger-done');
+  if (!WORKER_URL) { send.classList.add('hidden'); done.classList.remove('hidden'); return; }
+  send.classList.remove('hidden');
+  done.classList.add('hidden');
+  send.textContent = krogerToken() ? 'Send to cart' : 'Sign in to Kroger';
+}
+
+async function sendToKrogerCart() {
+  if (!WORKER_URL) return;
+  if (!krogerToken()) return krogerSignIn();
+
+  const btn = document.getElementById('kroger-send');
+  btn.disabled = true;
+  await loadUpcFile();
+
+  // Shoppable ingredients only — staples are already in the kitchen.
+  const shoppable = activeRecipe.ingredients
+    .map(raw => ({ raw, term: searchTermFor(raw) }))
+    .filter(it => !isPantry(it.raw, it.term));
+
+  cartStatus('Looking up ' + shoppable.length + ' items\u2026');
+
+  const resolved = [];
+  const askAbout = [];
+
+  for (const it of shoppable) {
+    const r = await resolveIngredient(it.raw, it.term);
+    if (r.status === 'ok') resolved.push(r.entry);
+    else if (r.status === 'choose') askAbout.push({ raw: it.raw, term: it.term, options: r.options });
+  }
+
+  const finish = async () => {
+    // Pull in anything the picker resolved.
+    askAbout.forEach(a => { if (a.resolved) resolved.push(a.resolved); });
+
+    if (!resolved.length) {
+      cartStatus('Nothing could be matched to a Kroger product.', true);
+      btn.disabled = false;
+      return;
+    }
+
+    cartStatus('Adding ' + resolved.length + ' items\u2026');
+    try {
+      const res = await fetch(WORKER_URL + '/cart/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + krogerToken()
+        },
+        body: JSON.stringify({
+          items: resolved.map(e => ({ upc: e.upc, quantity: 1, modality: 'PICKUP' }))
+        })
+      });
+      const out = await res.json();
+
+      if (res.status === 401) {
+        try { localStorage.removeItem(KROGER_TOKEN_KEY); } catch (e) {}
+        cartStatus('Kroger sign-in expired. Tap to sign in again.', true);
+        refreshCartButton();
+      } else if (out.ok) {
+        document.getElementById('cart-verify').classList.add('show');
+        const missed = shoppable.length - resolved.length;
+        cartStatus('Added ' + resolved.length + ' items to your Kroger cart.' +
+          (missed > 0 ? ' ' + missed + ' skipped.' : '') +
+          ' Check the cart on kroger.com before checkout.');
+      } else {
+        cartStatus('Kroger rejected the request (' + out.status + ').', true);
+      }
+    } catch (e) {
+      cartStatus('Could not reach Kroger. Check your connection.', true);
+    }
+    btn.disabled = false;
+  };
+
+  if (askAbout.length) openPicker(askAbout, finish);
+  else finish();
+}
+
 /* ---- Kroger shopping sheet ------------------------------------
    Kroger has no public URL that accepts a list of items, so this
    builds one search link per ingredient instead. The ingredient
@@ -1169,6 +1294,9 @@ function addToKrogerList() {
   document.getElementById('kroger-body').innerHTML = html;
   document.getElementById('kroger-body').scrollTop = 0;
   document.getElementById('kroger-copy').textContent = 'Copy list';
+  cartStatus('');
+  document.getElementById('cart-verify').classList.remove('show');
+  refreshCartButton();
   document.getElementById('kroger-scrim').classList.add('open');
   document.getElementById('kroger-sheet').classList.add('open');
 }
@@ -1394,6 +1522,7 @@ function showScreen(id) {
 }
 
 document.getElementById('welcome-skip-btn').classList.toggle('checked', localStorage.getItem(SKIP_WELCOME_KEY) === '1');
+readTokenFromHash();
 loadUpcCache();
 loadUpcFile();
 initWelcome();
