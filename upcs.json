@@ -1,0 +1,775 @@
+{
+  "schemaVersion": 1,
+  "updated": "2026-08-12",
+  "revalidateDays": 30,
+  "note": "upc/product/size/checkedAt are filled in by the app after a Kroger product lookup. null means never resolved. UPCs are 13 digits and are store-specific — see storeId.",
+  "storeId": null,
+  "aliases": {
+    "Romaine hearts": "Romaine heart",
+    "Sweet potatoes": "Sweet potato",
+    "Kroger Corn Starch": "Cornstarch"
+  },
+  "skip": [
+    "Grated Parmigiano Reggiano for the table",
+    "Green food coloring",
+    "Buns"
+  ],
+  "items": {
+    "Amy's Organic Lentil Chili": {
+      "query": "Amy's Organic Lentil Chili",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "lentil-chili-asparagus"
+      ]
+    },
+    "Asparagus": {
+      "query": "asparagus",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "lentil-chili-asparagus"
+      ]
+    },
+    "Avocado": {
+      "query": "avocado",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "air-fryer-shrimp-tacos"
+      ]
+    },
+    "Baby bella mushrooms": {
+      "query": "baby bella mushrooms",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "ribeye-mushroom"
+      ]
+    },
+    "Boneless skinless chicken breasts": {
+      "query": "boneless skinless chicken breast",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "honey-mustard-chicken-sandwich"
+      ]
+    },
+    "Broccolini": {
+      "query": "broccolini",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "smoked-salmon-broccolini"
+      ]
+    },
+    "Ceriello Homestyle Marinara": {
+      "query": "Ceriello Homestyle Marinara",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "sausage-penne-marinara"
+      ]
+    },
+    "Chopped dill pickle": {
+      "query": "dill pickles",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "dill-hamburger"
+      ]
+    },
+    "Claussen Bread and Butter Pickle Slices": {
+      "query": "Claussen Bread and Butter Pickle Slices",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "honey-mustard-chicken-sandwich"
+      ]
+    },
+    "Cooked bacon": {
+      "query": "fully cooked bacon",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "honey-citrus-salad"
+      ]
+    },
+    "Cornstarch": {
+      "query": "corn starch",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "grass-fed-burger-fries",
+        "air-fryer-shrimp-tacos",
+        "beef-guac-burger-fries",
+        "dairy-free-choco-pistachio"
+      ]
+    },
+    "Creamer potatoes": {
+      "query": "creamer potatoes",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "smoked-salmon-broccolini"
+      ]
+    },
+    "Croutons": {
+      "query": "croutons",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "ravioli-caesar"
+      ]
+    },
+    "Dairy-free cheddar shreds": {
+      "query": "dairy free cheddar shreds",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "beef-tacos-cheddar",
+        "honey-citrus-salad"
+      ]
+    },
+    "Earth Balance Buttery Sticks": {
+      "query": "Earth Balance Buttery Sticks",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "dairy-free-choco-pistachio"
+      ]
+    },
+    "Enjoy Life Dark Chocolate Morsels": {
+      "query": "Enjoy Life Dark Chocolate Morsels",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "dairy-free-choco-pistachio"
+      ]
+    },
+    "Follow Your Heart Dairy Free Vegan Ranch": {
+      "query": "Follow Your Heart Dairy Free Vegan Ranch",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "dill-hamburger"
+      ]
+    },
+    "Fresh Cravings Pico de Gallo": {
+      "query": "Fresh Cravings Pico de Gallo",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "zesty-beef-tacos-pico"
+      ]
+    },
+    "Guerrero Corn Tortillas": {
+      "query": "Guerrero Corn Tortillas",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "zesty-beef-tacos-pico"
+      ]
+    },
+    "Hershey’s Special Dark Cocoa": {
+      "query": "Hershey's Special Dark cocoa",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "dairy-free-choco-pistachio"
+      ]
+    },
+    "Italian Harvest Penne Rigate": {
+      "query": "Italian Harvest Penne Rigate",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "sausage-penne-marinara"
+      ]
+    },
+    "Kite Hill Dairy Free Sour Cream": {
+      "query": "Kite Hill Dairy Free Sour Cream",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "green-chile-enchiladas"
+      ]
+    },
+    "Kite Hill Dairy-Free Ravioli": {
+      "query": "Kite Hill Dairy-Free Ravioli",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "ravioli-caesar",
+        "lemon-plant-butter-ravioli"
+      ]
+    },
+    "Kroger All-Purpose Flour": {
+      "query": "Kroger All-Purpose Flour",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "dairy-free-choco-pistachio"
+      ]
+    },
+    "Kroger Apple Cider Vinegar": {
+      "query": "Kroger Apple Cider Vinegar",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "dairy-free-choco-pistachio"
+      ]
+    },
+    "Kroger Baking Powder": {
+      "query": "Kroger Baking Powder",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "dairy-free-choco-pistachio"
+      ]
+    },
+    "Kroger Baking Soda": {
+      "query": "Kroger Baking Soda",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "dairy-free-choco-pistachio"
+      ]
+    },
+    "Kroger Broccoli Slaw": {
+      "query": "Kroger Broccoli Slaw",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "bang-chicken-tacos",
+        "air-fryer-shrimp-tacos"
+      ]
+    },
+    "Kroger Flour Tortillas": {
+      "query": "Kroger Flour Tortillas",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "green-chile-enchiladas"
+      ]
+    },
+    "Kroger Granulated Sugar": {
+      "query": "Kroger Granulated Sugar",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "dairy-free-choco-pistachio"
+      ]
+    },
+    "Kroger Hamburger Buns": {
+      "query": "Kroger Hamburger Buns",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "dill-hamburger",
+        "grass-fed-burger-fries",
+        "beef-guac-burger-fries"
+      ]
+    },
+    "Kroger Honey Mustard": {
+      "query": "Kroger Honey Mustard",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "honey-mustard-chicken-sandwich"
+      ]
+    },
+    "Kroger Pure Almond Extract": {
+      "query": "Kroger Pure Almond Extract",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "dairy-free-choco-pistachio"
+      ]
+    },
+    "Kroger Pure Vanilla Extract": {
+      "query": "Kroger Pure Vanilla Extract",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "dairy-free-choco-pistachio"
+      ]
+    },
+    "Kroger Roasted Salted Pistachios": {
+      "query": "Kroger Roasted Salted Pistachios",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "dairy-free-choco-pistachio"
+      ]
+    },
+    "Kroger Soft Taco Flour Tortillas": {
+      "query": "Kroger Soft Taco Flour Tortillas",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "bang-chicken-tacos"
+      ]
+    },
+    "Kroger Sweet Kale Salad Kit": {
+      "query": "Kroger Sweet Kale Salad Kit",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "lemon-plant-butter-ravioli"
+      ]
+    },
+    "Large eggs": {
+      "query": "large eggs",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "dairy-free-choco-pistachio"
+      ]
+    },
+    "Lemon": {
+      "query": "lemons",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "lentil-chili-asparagus",
+        "smoked-salmon-broccolini",
+        "lemon-plant-butter-ravioli"
+      ]
+    },
+    "Lime": {
+      "query": "limes",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "beef-tacos-cheddar",
+        "bang-chicken-tacos",
+        "street-corn-salad",
+        "air-fryer-shrimp-tacos",
+        "beef-guac-burger-fries"
+      ]
+    },
+    "Lovera’s Original Italian Sausage": {
+      "query": "Lovera's Italian sausage mild",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "sausage-penne-marinara"
+      ]
+    },
+    "Mae Ploy Sweet Chili Sauce": {
+      "query": "Mae Ploy Sweet Chili Sauce",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "bang-chicken-tacos",
+        "air-fryer-shrimp-tacos"
+      ]
+    },
+    "Mayonnaise": {
+      "query": "mayonnaise",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "bang-chicken-tacos"
+      ]
+    },
+    "McCormick Garlic & Herb Seasoning": {
+      "query": "McCormick Garlic & Herb Seasoning",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "grass-fed-burger-fries"
+      ]
+    },
+    "Mission Almond Flour Tortilla Wraps": {
+      "query": "Mission Almond Flour Tortilla Wraps",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "beef-tacos-cheddar"
+      ]
+    },
+    "Mission Corn Tortillas": {
+      "query": "Mission Corn Tortillas",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "air-fryer-shrimp-tacos"
+      ]
+    },
+    "Old El Paso Chopped Green Chiles": {
+      "query": "Old El Paso Chopped Green Chiles",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "green-chile-enchiladas"
+      ]
+    },
+    "Old El Paso Taco Seasoning": {
+      "query": "Old El Paso Taco Seasoning",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "beef-tacos-cheddar",
+        "zesty-beef-tacos-pico"
+      ]
+    },
+    "Perdue Breaded Chicken Nuggets": {
+      "query": "Perdue Breaded Chicken Nuggets",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "bang-chicken-tacos"
+      ]
+    },
+    "Pistachio butter": {
+      "query": "pistachio butter",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "dairy-free-choco-pistachio"
+      ]
+    },
+    "Plant butter": {
+      "query": "Miyoko's plant butter",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "ribeye-mushroom",
+        "turkey-meatloaf",
+        "lemon-plant-butter-ravioli"
+      ]
+    },
+    "Pork tenderloin": {
+      "query": "pork tenderloin",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "blackened-pork"
+      ]
+    },
+    "Pre-made turkey meatloaf": {
+      "query": "turkey meatloaf",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "turkey-meatloaf"
+      ]
+    },
+    "Rainbow baby carrots": {
+      "query": "rainbow baby carrots",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "blackened-pork"
+      ]
+    },
+    "Rao's Homemade Marinara": {
+      "query": "Rao's Homemade Marinara",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "ravioli-caesar"
+      ]
+    },
+    "Raw shrimp": {
+      "query": "raw shrimp peeled deveined",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "air-fryer-shrimp-tacos"
+      ]
+    },
+    "Ribeye steak": {
+      "query": "ribeye steak",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "ribeye-mushroom"
+      ]
+    },
+    "Romaine heart": {
+      "query": "romaine hearts",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "ravioli-caesar",
+        "zesty-beef-tacos-pico"
+      ]
+    },
+    "Russet potatoes": {
+      "query": "russet potatoes",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "ribeye-mushroom"
+      ]
+    },
+    "Simple Truth 85/15 Ground Beef": {
+      "query": "Simple Truth ground beef 85/15",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "beef-tacos-cheddar",
+        "honey-citrus-salad",
+        "street-corn-salad"
+      ]
+    },
+    "Simple Truth 85/15 Ground Beef Patties": {
+      "query": "Simple Truth ground beef patties 85/15",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "dill-hamburger",
+        "grass-fed-burger-fries",
+        "zesty-beef-tacos-pico",
+        "beef-guac-burger-fries"
+      ]
+    },
+    "Simple Truth Pulled Roasted Chicken": {
+      "query": "Simple Truth Pulled Roasted Chicken",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "green-chile-enchiladas"
+      ]
+    },
+    "Simple Truth Unsweetened Soy Milk": {
+      "query": "Simple Truth Unsweetened Soy Milk",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "dairy-free-choco-pistachio"
+      ]
+    },
+    "Smoked salmon": {
+      "query": "hot smoked salmon",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "smoked-salmon-broccolini"
+      ]
+    },
+    "Sugar snap peas": {
+      "query": "sugar snap peas",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "blackened-pork"
+      ]
+    },
+    "Sweet Baby Ray's BBQ Sauce": {
+      "query": "Sweet Baby Ray's BBQ Sauce",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "street-corn-salad"
+      ]
+    },
+    "Sweet potato": {
+      "query": "sweet potatoes",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "turkey-meatloaf",
+        "grass-fed-burger-fries",
+        "beef-guac-burger-fries"
+      ]
+    },
+    "Taylor Farms Honey Citrus Chopped Salad Kit": {
+      "query": "Taylor Farms Honey Citrus Chopped Salad Kit",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "honey-citrus-salad"
+      ]
+    },
+    "Taylor Farms Mexican Street Corn Chopped Salad Kit": {
+      "query": "Taylor Farms Mexican Street Corn Chopped Salad Kit",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "street-corn-salad"
+      ]
+    },
+    "Vegan Caesar dressing": {
+      "query": "vegan caesar dressing",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "ravioli-caesar"
+      ]
+    },
+    "Walnuts": {
+      "query": "walnut halves",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "lemon-plant-butter-ravioli"
+      ]
+    },
+    "Wholly Guacamole Classic Mild": {
+      "query": "Wholly Guacamole Classic Mild",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "beef-guac-burger-fries"
+      ]
+    },
+    "Zatarain's Blackened Seasoning": {
+      "query": "Zatarain's Blackened Seasoning",
+      "upc": null,
+      "product": null,
+      "size": null,
+      "checkedAt": null,
+      "usedIn": [
+        "blackened-pork"
+      ]
+    }
+  }
+}

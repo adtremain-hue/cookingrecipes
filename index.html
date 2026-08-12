@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<meta name="recipe-app-version" content="1.3.0" />
+<meta name="recipe-app-version" content="1.4.0" />
 <title>K.'s Recipes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -107,6 +107,23 @@
   .done-mark { width: 64px; height: 64px; border-radius: 50%; background: #E8B339; color: #1C2321; display: flex; align-items: center; justify-content: center; margin-bottom: 22px; font-size: 30px; font-weight: 700; }
   #screen-done h1 { font-family: 'Archivo Expanded', sans-serif; font-weight: 800; font-size: 28px; margin: 0 0 8px; }
   #screen-done p { font-size: 15px; color: rgba(244,239,228,0.65); font-weight: 500; margin: 0 0 40px; }
+
+
+  /* ---------- UPC PICKER ---------- */
+  .pick-row {
+    width: 100%; display: flex; align-items: center; gap: 12px; text-align: left;
+    background: none; border: none; border-bottom: 1px solid #F4EEE0;
+    padding: 14px 10px; cursor: pointer; font-family: inherit;
+  }
+  .pick-row:active { background: #FBF6EA; }
+  .pick-text { flex: 1; min-width: 0; }
+  .pick-name { display: block; font-size: 14.5px; font-weight: 600; color: #1C2321; line-height: 1.3; }
+  .pick-meta { display: block; font-size: 11.5px; font-weight: 500; color: #A8A08C; margin-top: 2px; }
+  .pick-skip .pick-name { color: #A8A08C; font-weight: 500; }
+  .cart-status {
+    font-size: 12px; font-weight: 600; color: #8A7F68; padding: 10px 10px 0;
+  }
+  .cart-status.error { color: #A34A2E; }
 
   /* ---------- KROGER SHEET ---------- */
   .scrim { position: absolute; inset: 0; background: rgba(28,35,33,0.55); opacity: 0; pointer-events: none; transition: opacity 0.22s ease; z-index: 40; }
@@ -403,6 +420,20 @@
         <div id="step-rows"></div>
         <button class="dyn-add" onclick="addStepRow()">+ Add step</button>
       </div>
+    </div>
+  </div>
+
+  <!-- UPC PICKER SHEET -->
+  <div class="scrim" id="picker-scrim" onclick="closePicker(false)"></div>
+  <div class="sheet" id="picker-sheet">
+    <div class="sheet-grip"></div>
+    <div class="sheet-head">
+      <h2>Which one?</h2>
+      <p id="picker-term"></p>
+    </div>
+    <div class="sheet-body" id="picker-body"></div>
+    <div class="sheet-foot">
+      <span class="cart-status" id="picker-count"></span>
     </div>
   </div>
 
@@ -824,6 +855,256 @@ function toggleIngredient(i) {
   renderIngredients();
 }
 
+
+/* =================================================================
+   UPC RESOLUTION
+   Ingredient strings are not UPCs. Kroger's cart endpoint only takes
+   13-digit UPCs, so every shoppable ingredient has to resolve to a
+   real product first.
+
+   Resolution order:
+     1. localStorage cache  (instant, this device)
+     2. upcs.json           (shared, committed to the repo)
+     3. Kroger product search via the Worker
+
+   A search can return several plausible products. When one clearly
+   wins, it is taken silently. When two or more are close, the user
+   picks once and the answer is cached for good.
+================================================================= */
+
+const WORKER_URL = '';           // e.g. 'https://ks-kroger.workers.dev' — blank disables cart mode
+const UPC_CACHE_KEY = 'ksRecipes.upcCache';
+const UPC_FILE = 'upcs.json';
+
+let upcFile = null;              // loaded from upcs.json
+let upcCache = {};               // localStorage overlay
+
+function loadUpcCache() {
+  try {
+    upcCache = JSON.parse(localStorage.getItem(UPC_CACHE_KEY)) || {};
+  } catch (e) {
+    upcCache = {};
+  }
+}
+
+function saveUpcCache() {
+  try { localStorage.setItem(UPC_CACHE_KEY, JSON.stringify(upcCache)); }
+  catch (e) { /* quota — cache is disposable, carry on */ }
+}
+
+async function loadUpcFile() {
+  if (upcFile) return upcFile;
+  try {
+    const res = await fetch(UPC_FILE, { cache: 'no-cache' });
+    if (!res.ok) throw new Error(res.status);
+    upcFile = await res.json();
+  } catch (e) {
+    upcFile = { items: {}, aliases: {}, skip: [], revalidateDays: 30 };
+  }
+  return upcFile;
+}
+
+/* Fold the plural/duplicate terms onto one canonical key. */
+function canonicalTerm(term) {
+  const a = (upcFile && upcFile.aliases) || {};
+  return a[term] || term;
+}
+
+function isSkipped(term) {
+  return !!(upcFile && upcFile.skip && upcFile.skip.includes(term));
+}
+
+/* An entry is stale once it is older than revalidateDays. Stale entries
+   are still used immediately — revalidation happens quietly afterward. */
+function isStale(entry) {
+  if (!entry || !entry.checkedAt) return true;
+  const days = (upcFile && upcFile.revalidateDays) || 30;
+  const age = (Date.now() - new Date(entry.checkedAt).getTime()) / 86400000;
+  return age > days;
+}
+
+function lookupEntry(term) {
+  const key = canonicalTerm(term);
+  return upcCache[key] || (upcFile && upcFile.items && upcFile.items[key]) || null;
+}
+
+function storeEntry(term, entry) {
+  upcCache[canonicalTerm(term)] = Object.assign({}, entry, { checkedAt: new Date().toISOString() });
+  saveUpcCache();
+}
+
+/* ---- Match scoring ---------------------------------------------
+   Kroger returns up to five products per search. This scores each
+   against the ingredient so an obvious winner can be taken without
+   interrupting the cook.
+------------------------------------------------------------------ */
+
+const STOPWORDS = ['the','a','of','and','for','with','or'];
+
+function tokens(str) {
+  return str.toLowerCase()
+    .replace(/[^a-z0-9\s%\/]/g, ' ')
+    .split(/\s+/)
+    .filter(t => t && !STOPWORDS.includes(t));
+}
+
+/* Pull a size out of the raw ingredient, e.g. "9 oz" or "1 lb". */
+function sizeHint(raw) {
+  const m = raw.match(/(\d+(?:\.\d+)?)\s*(oz|lb|lbs|ct|count|g|kg|ml|l|pack)\b/i);
+  return m ? { n: parseFloat(m[1]), unit: m[2].toLowerCase() } : null;
+}
+
+function scoreProduct(product, term, raw) {
+  const desc = (product.description || '');
+  const dTokens = tokens(desc);
+  const tTokens = tokens(term);
+  if (!tTokens.length) return 0;
+
+  // How much of the ingredient name appears in the product name.
+  const hit = tTokens.filter(t => dTokens.includes(t)).length;
+  let score = hit / tTokens.length;
+
+  // The whole phrase appearing verbatim is a strong signal.
+  if (desc.toLowerCase().includes(term.toLowerCase())) score += 0.10;
+
+  // Brand stated in the ingredient and matched by the product.
+  const brand = (product.brand || '').toLowerCase();
+  if (brand && tTokens.some(t => brand.includes(t))) score += 0.15;
+
+  // Size stated in the ingredient and matched by the product.
+  const want = sizeHint(raw);
+  const have = product.items && product.items[0] && product.items[0].size;
+  if (want && have) {
+    const got = String(have).toLowerCase();
+    if (got.includes(String(want.n)) && got.includes(want.unit)) score += 0.15;
+  }
+
+  return Math.min(score, 1);
+}
+
+/* ---- The search itself ------------------------------------------ */
+
+async function searchKroger(query) {
+  if (!WORKER_URL) return [];
+  try {
+    const res = await fetch(WORKER_URL + '/search?q=' + encodeURIComponent(query));
+    if (!res.ok) return [];
+    const json = await res.json();
+    return json.data || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function productToEntry(p) {
+  const item = (p.items && p.items[0]) || {};
+  return {
+    upc: p.upc,
+    product: p.description || '',
+    brand: p.brand || '',
+    size: item.size || ''
+  };
+}
+
+/* Returns one of:
+     { status:'ok',      entry }
+     { status:'choose',  options:[entry,...] }
+     { status:'none' }
+*/
+async function resolveIngredient(raw, term) {
+  if (isSkipped(term)) return { status: 'none', reason: 'skipped' };
+
+  const cached = lookupEntry(term);
+  if (cached && cached.upc && !isStale(cached)) {
+    return { status: 'ok', entry: cached };
+  }
+
+  const entry = upcFile && upcFile.items && upcFile.items[canonicalTerm(term)];
+  const query = (cached && cached.query) || (entry && entry.query) || term;
+  const products = await searchKroger(query);
+
+  if (!products.length) {
+    // A stale cached UPC beats nothing at all.
+    if (cached && cached.upc) return { status: 'ok', entry: cached, stale: true };
+    return { status: 'none', reason: 'no results' };
+  }
+
+  const ranked = products
+    .map(p => ({ p, score: scoreProduct(p, term, raw) }))
+    .sort((a, b) => b.score - a.score);
+
+  const top = ranked[0];
+  const next = ranked[1];
+  const clearWinner = top.score >= 0.85 && (!next || top.score - next.score >= 0.15);
+
+  if (clearWinner) {
+    const e = productToEntry(top.p);
+    storeEntry(term, e);
+    return { status: 'ok', entry: e };
+  }
+
+  return {
+    status: 'choose',
+    options: ranked.slice(0, 4).map(r => productToEntry(r.p))
+  };
+}
+
+/* ---- Picker -----------------------------------------------------
+   Shown only for the ingredients that were genuinely ambiguous.
+   Answering once writes the choice to the cache, so the same
+   ingredient never asks again.
+------------------------------------------------------------------ */
+
+let pickerQueue = [];
+let pickerDone = null;
+
+function openPicker(queue, onDone) {
+  pickerQueue = queue;
+  pickerDone = onDone;
+  renderPicker();
+  document.getElementById('picker-scrim').classList.add('open');
+  document.getElementById('picker-sheet').classList.add('open');
+}
+
+function renderPicker() {
+  const current = pickerQueue[0];
+  if (!current) return closePicker(true);
+
+  document.getElementById('picker-term').textContent = current.raw;
+  document.getElementById('picker-count').textContent =
+    pickerQueue.length + ' left';
+
+  document.getElementById('picker-body').innerHTML = current.options.map((o, i) => `
+    <button class="pick-row" onclick="choosePick(${i})">
+      <span class="pick-text">
+        <span class="pick-name">${esc(o.product)}</span>
+        <span class="pick-meta">${esc([o.brand, o.size].filter(Boolean).join(' \u00b7 '))}</span>
+      </span>
+      <span class="shop-go">&#8250;</span>
+    </button>
+  `).join('') + `
+    <button class="pick-row pick-skip" onclick="choosePick(-1)">
+      <span class="pick-text"><span class="pick-name">Skip this one</span>
+      <span class="pick-meta">Leave it off the cart</span></span>
+    </button>`;
+}
+
+function choosePick(i) {
+  const current = pickerQueue.shift();
+  if (i >= 0) {
+    storeEntry(current.term, current.options[i]);
+    current.resolved = current.options[i];
+  }
+  if (pickerQueue.length) renderPicker();
+  else closePicker(true);
+}
+
+function closePicker(finished) {
+  document.getElementById('picker-scrim').classList.remove('open');
+  document.getElementById('picker-sheet').classList.remove('open');
+  if (finished && pickerDone) { const d = pickerDone; pickerDone = null; d(); }
+}
+
 /* ---- Kroger shopping sheet ------------------------------------
    Kroger has no public URL that accepts a list of items, so this
    builds one search link per ingredient instead. The ingredient
@@ -1113,6 +1394,8 @@ function showScreen(id) {
 }
 
 document.getElementById('welcome-skip-btn').classList.toggle('checked', localStorage.getItem(SKIP_WELCOME_KEY) === '1');
+loadUpcCache();
+loadUpcFile();
 initWelcome();
 </script>
 
