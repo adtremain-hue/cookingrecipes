@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<meta name="recipe-app-version" content="1.6.0" />
+<meta name="recipe-app-version" content="1.7.0" />
 <title>K.'s Recipes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -456,7 +456,7 @@
     <a class="cart-verify" id="cart-verify" href="https://www.kroger.com/cart" target="_blank" rel="noopener">Open my Kroger cart &#8599;</a>
     <div class="sheet-foot">
       <button class="sheet-btn ghost" onclick="copyShoppingList()" id="kroger-copy">Copy list</button>
-      <button class="sheet-btn solid hidden" onclick="sendToKrogerCart()" id="kroger-send">Send to cart</button>
+      <button class="sheet-btn solid hidden" onclick="sendToKrogerCart()" id="kroger-send">Build pickup cart</button>
       <button class="sheet-btn solid" onclick="closeKroger()" id="kroger-done">Done</button>
     </div>
   </div>
@@ -1156,7 +1156,7 @@ function refreshCartButton() {
   if (!WORKER_URL) { send.classList.add('hidden'); done.classList.remove('hidden'); return; }
   send.classList.remove('hidden');
   done.classList.add('hidden');
-  send.textContent = krogerToken() ? 'Send to cart' : 'Sign in to Kroger';
+  send.textContent = krogerToken() ? 'Build pickup cart' : 'Sign in to Kroger';
 }
 
 async function sendToKrogerCart() {
@@ -1169,8 +1169,15 @@ async function sendToKrogerCart() {
 
   // Shoppable ingredients only — staples are already in the kitchen.
   const shoppable = activeRecipe.ingredients
-    .map(raw => ({ raw, term: searchTermFor(raw) }))
-    .filter(it => !isPantry(it.raw, it.term));
+    .map((raw, i) => ({ raw, i, term: searchTermFor(raw) }))
+    .filter(it => !isPantry(it.raw, it.term))
+    .filter(it => !checkedItems[it.i]);   // checked means "already have it"
+
+  if (!shoppable.length) {
+    cartStatus('Everything is checked off \u2014 nothing to buy.');
+    btn.disabled = false;
+    return;
+  }
 
   cartStatus('Looking up ' + shoppable.length + ' items\u2026');
 
@@ -1268,9 +1275,10 @@ function krogerUrl(term) {
 
 function addToKrogerList() {
   const buy = [], staples = [];
-  activeRecipe.ingredients.forEach(raw => {
+  activeRecipe.ingredients.forEach((raw, i) => {
     const term = searchTermFor(raw);
-    (isPantry(raw, term) ? staples : buy).push({ raw, term });
+    const have = isPantry(raw, term) || checkedItems[i];
+    (have ? staples : buy).push({ raw, term });
   });
 
   let html = buy.map((it, i) => `
@@ -1285,7 +1293,7 @@ function addToKrogerList() {
   `).join('');
 
   if (staples.length) {
-    html += `<div class="staple-head">Already in your kitchen</div>` +
+    html += `<div class="staple-head">Already have</div>` +
       staples.map(it => `
         <div class="staple-row"><span class="staple-dot"></span>${esc(it.raw)}</div>
       `).join('');
