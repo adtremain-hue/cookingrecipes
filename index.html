@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<meta name="recipe-app-version" content="1.7.0" />
+<meta name="recipe-app-version" content="1.7.1" />
 <title>K.'s Recipes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -881,7 +881,7 @@ function toggleIngredient(i) {
    picks once and the answer is cached for good.
 ================================================================= */
 
-const WORKER_URL = '';           // e.g. 'https://ks-kroger.workers.dev' — blank disables cart mode
+const WORKER_URL = 'https://kroger-recipes.adtremain.workers.dev';  // blank disables cart mode
 const UPC_CACHE_KEY = 'ksRecipes.upcCache';
 const UPC_FILE = 'upcs.json';
 
