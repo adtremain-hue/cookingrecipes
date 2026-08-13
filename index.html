@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<meta name="recipe-app-version" content="1.7.2" />
+<meta name="recipe-app-version" content="1.7.4" />
 <title>K.'s Recipes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -120,6 +120,11 @@
   .pick-name { display: block; font-size: 14.5px; font-weight: 600; color: #1C2321; line-height: 1.3; }
   .pick-meta { display: block; font-size: 11.5px; font-weight: 500; color: #A8A08C; margin-top: 2px; }
   .pick-skip .pick-name { color: #A8A08C; font-weight: 500; }
+  .pick-prev {
+    display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
+    text-transform: uppercase; color: #B5793A; background: #F4E9D2;
+    padding: 3px 7px; border-radius: 20px; margin-left: 7px; vertical-align: 1px;
+  }
   .cart-status {
     font-size: 12px; font-weight: 600; color: #8A7F68; padding: 10px 10px 0;
   }
@@ -890,6 +895,10 @@ const WORKER_URL = 'https://kroger-recipes.adtremain.workers.dev';  // blank dis
 const UPC_CACHE_KEY = 'ksRecipes.upcCache';
 const UPC_FILE = 'upcs.json';
 
+/* true  = always show the picker, even for ingredients answered before.
+   false = a confident match or a cached answer goes through silently. */
+const ALWAYS_ASK = true;
+
 let upcFile = null;              // loaded from upcs.json
 let upcCache = {};               // localStorage overlay
 
@@ -1029,7 +1038,7 @@ async function resolveIngredient(raw, term) {
   if (isSkipped(term)) return { status: 'none', reason: 'skipped' };
 
   const cached = lookupEntry(term);
-  if (cached && cached.upc && !isStale(cached)) {
+  if (!ALWAYS_ASK && cached && cached.upc && !isStale(cached)) {
     return { status: 'ok', entry: cached };
   }
 
@@ -1051,16 +1060,19 @@ async function resolveIngredient(raw, term) {
   const next = ranked[1];
   const clearWinner = top.score >= 0.85 && (!next || top.score - next.score >= 0.15);
 
-  if (clearWinner) {
+  if (!ALWAYS_ASK && clearWinner) {
     const e = productToEntry(top.p);
     storeEntry(term, e);
     return { status: 'ok', entry: e };
   }
 
-  return {
-    status: 'choose',
-    options: ranked.slice(0, 4).map(r => productToEntry(r.p))
-  };
+  const options = ranked.slice(0, 4).map(r => productToEntry(r.p));
+  if (cached && cached.upc) {
+    const without = options.filter(o => o.upc !== cached.upc);
+    options.length = 0;
+    options.push({ ...cached, previously: true }, ...without.slice(0, 3));
+  }
+  return { status: 'choose', options };
 }
 
 /* ---- Picker -----------------------------------------------------
@@ -1073,7 +1085,9 @@ let pickerQueue = [];
 let pickerDone = null;
 
 function openPicker(queue, onDone) {
-  pickerQueue = queue;
+  // slice(), not the array itself: choosePick() shifts this queue, and the
+  // caller still needs its own list intact to read .resolved off afterward.
+  pickerQueue = queue.slice();
   pickerDone = onDone;
   renderPicker();
   document.getElementById('picker-scrim').classList.add('open');
@@ -1091,7 +1105,7 @@ function renderPicker() {
   document.getElementById('picker-body').innerHTML = current.options.map((o, i) => `
     <button class="pick-row" onclick="choosePick(${i})">
       <span class="pick-text">
-        <span class="pick-name">${esc(o.product)}</span>
+        <span class="pick-name">${esc(o.product)}${o.previously ? '<span class="pick-prev">Previously bought</span>' : ''}</span>
         <span class="pick-meta">${esc([o.brand, o.size].filter(Boolean).join(' \u00b7 '))}</span>
       </span>
       <span class="shop-go">&#8250;</span>
@@ -1106,8 +1120,10 @@ function renderPicker() {
 function choosePick(i) {
   const current = pickerQueue.shift();
   if (i >= 0) {
-    storeEntry(current.term, current.options[i]);
-    current.resolved = current.options[i];
+    // `previously` is a display flag only — keep it out of stored data.
+    const { previously, ...chosen } = current.options[i];
+    storeEntry(current.term, chosen);
+    current.resolved = chosen;
   }
   if (pickerQueue.length) renderPicker();
   else closePicker(true);
