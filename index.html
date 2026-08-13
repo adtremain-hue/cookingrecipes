@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<meta name="recipe-app-version" content="1.7.5" />
+<meta name="recipe-app-version" content="1.7.6" />
 <title>K.'s Recipes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1557,6 +1557,39 @@ readTokenFromHash();
 loadUpcCache();
 loadUpcFile();
 initWelcome();
+
+/* =================================================================
+   SERVICE WORKER
+   Registered so the installed home-screen app can update itself.
+   sw.js uses network-first, so a launch with a signal always gets the
+   current file and the cache is only a fallback when offline.
+================================================================= */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      // Check for a new version on every launch.
+      reg.update().catch(() => {});
+      reg.addEventListener('updatefound', () => {
+        const fresh = reg.installing;
+        if (!fresh) return;
+        fresh.addEventListener('statechange', () => {
+          // A new worker is waiting and an old one is in control: an update
+          // landed. Activate it and reload once so the user sees it now.
+          if (fresh.state === 'installed' && navigator.serviceWorker.controller) {
+            fresh.postMessage('skipWaiting');
+          }
+        });
+      });
+    }).catch(() => {});
+
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (reloaded) return;      // guard against a reload loop
+      reloaded = true;
+      location.reload();
+    });
+  });
+}
 </script>
 
 </body>
