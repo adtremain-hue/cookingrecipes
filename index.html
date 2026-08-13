@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<meta name="recipe-app-version" content="1.7.6" />
+<meta name="recipe-app-version" content="1.8.0" />
 <title>K.'s Recipes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -209,12 +209,31 @@
   /* ---------- LIST HEADER: add button ---------- */
   .list-header-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
   .list-header-titles { flex: 1; min-width: 0; }
+  .header-btns { display: flex; gap: 8px; flex-shrink: 0; margin-top: 2px; }
   .add-recipe-btn {
     flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; border: none;
     background: #E8B339; color: #1C2321; font-size: 20px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center; cursor: pointer; margin-top: 2px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
   }
   .add-recipe-btn:active { background: #D9A52D; }
+  .import-recipe-btn {
+    flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; border: none;
+    background: rgba(244,239,228,0.12); color: #F4EFE4; font-size: 17px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .import-recipe-btn:active { background: rgba(244,239,228,0.22); }
+
+  /* ---------- IMPORT RECIPE SCREEN ---------- */
+  #screen-import { background: #FFFDF8; }
+  .import-body { flex: 1; overflow-y: auto; padding: 20px 20px 40px; -webkit-overflow-scrolling: touch; }
+  .import-intro { font-size: 13.5px; line-height: 1.55; color: #8A7F68; font-weight: 500; margin: 0 0 18px; }
+  .import-intro b { color: #4A453C; }
+  .import-textarea {
+    width: 100%; min-height: 260px; border: 1.5px solid #E7DFCC; border-radius: 12px; background: #FFFDF8;
+    padding: 13px 14px; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 12.5px;
+    line-height: 1.5; color: #1C2321; resize: vertical;
+  }
+  .import-textarea:focus { outline: none; border-color: #E8B339; }
 
   /* ---------- ADD RECIPE SCREEN ---------- */
   #screen-add { background: #FFFDF8; }
@@ -306,7 +325,10 @@
           <h1>K.'s Recipes</h1>
           <p id="list-subtitle">tap one to start</p>
         </div>
-        <button class="add-recipe-btn" onclick="openAddRecipe()" aria-label="Add a recipe">+</button>
+        <div class="header-btns">
+          <button class="import-recipe-btn" onclick="openImportRecipe()" aria-label="Import a recipe">&#128229;</button>
+          <button class="add-recipe-btn" onclick="openAddRecipe()" aria-label="Add a recipe">+</button>
+        </div>
       </div>
     </header>
     <div class="list-body" id="list-body"></div>
@@ -450,6 +472,35 @@
     <div class="sheet-body" id="picker-body"></div>
     <div class="sheet-foot">
       <span class="cart-status" id="picker-count"></span>
+    </div>
+  </div>
+
+  <!-- SCREEN 6: IMPORT RECIPE -->
+  <div id="screen-import" class="screen hidden">
+    <div class="add-topbar">
+      <button class="icon-btn" onclick="cancelImportRecipe()">&#8592;</button>
+      <h2>Import a recipe</h2>
+      <button class="add-save-btn" onclick="saveImportedRecipe()">Import</button>
+    </div>
+    <div class="import-body">
+      <div class="add-error" id="import-error"></div>
+      <p class="import-intro">
+        Send Claude a recipe link or PDF in chat and ask for it as JSON for this app.
+        Paste the result below &mdash; it saves to <b>this device</b>, same as a recipe you add by hand.
+      </p>
+      <textarea class="import-textarea" id="import-json" spellcheck="false" autocapitalize="off" autocorrect="off" placeholder='{
+  "title": "Garlic Butter Shrimp Pasta",
+  "subtitle": "Weeknight pasta, dairy-free",
+  "day": "Imported recipes",
+  "time": "20 min",
+  "servings": 2,
+  "tools": ["Skillet", "Large pot"],
+  "ingredients": ["Shrimp, 1 lb", "Spaghetti, 8 oz"],
+  "steps": [
+    { "title": "Boil pasta", "body": "Cook to package time." },
+    { "title": "Sear shrimp", "body": "2 minutes per side.", "note": "Optional tip" }
+  ]
+}'></textarea>
     </div>
   </div>
 
@@ -1478,6 +1529,91 @@ function saveRecipe() {
   const list = loadUserRecipes();
   list.push(recipe);
   saveUserRecipes(list);
+
+  goToList();
+  openRecipe(unique);
+}
+
+/* =================================================================
+   IMPORT A RECIPE
+   Interim workflow: Claude (in chat) turns a URL or PDF into a JSON
+   object matching the RECIPES schema; the user pastes it here. It's
+   validated like the manual add form, then saved to this device.
+   End goal: a Worker endpoint that does the parsing server-side so
+   this becomes a one-tap button with the API key hidden.
+================================================================= */
+function openImportRecipe() {
+  document.getElementById('import-json').value = '';
+  document.getElementById('import-error').classList.remove('show');
+  showScreen('screen-import');
+  document.getElementById('screen-import').scrollTop = 0;
+}
+
+function cancelImportRecipe() {
+  goToList();
+}
+
+function showImportError(msg) {
+  const el = document.getElementById('import-error');
+  el.textContent = msg;
+  el.classList.add('show');
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function saveImportedRecipe() {
+  let raw = document.getElementById('import-json').value.trim();
+  if (!raw) return showImportError('Paste the recipe JSON first.');
+
+  // Tolerate a fenced code block if it got copied along with the JSON.
+  raw = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (e) {
+    return showImportError("That isn't valid JSON \u2014 check for a missing comma, quote, or bracket, then try again.");
+  }
+  if (Array.isArray(parsed)) parsed = parsed[0];
+  if (!parsed || typeof parsed !== 'object') {
+    return showImportError('That JSON needs to be a single recipe object.');
+  }
+
+  const str = v => (v == null ? '' : String(v).trim());
+  const title = str(parsed.title);
+  const ingredients = Array.isArray(parsed.ingredients)
+    ? parsed.ingredients.map(str).filter(Boolean) : [];
+  const steps = (Array.isArray(parsed.steps) ? parsed.steps : [])
+    .map(s => ({ title: str(s && s.title), body: str(s && s.body), note: str(s && s.note) }))
+    .filter(s => s.title || s.body)
+    .map(s => s.note ? s : { title: s.title, body: s.body });
+
+  if (!title) return showImportError('The JSON needs a "title".');
+  if (!ingredients.length) return showImportError('The JSON needs a non-empty "ingredients" array.');
+  if (!steps.length) return showImportError('The JSON needs a "steps" array, each with a title or body.');
+
+  const existingIds = getAllRecipes().map(r => r.id);
+  let base = 'user-' + slugify(title);
+  if (base === 'user-') base = 'user-recipe';
+  let unique = base, n = 2;
+  while (existingIds.includes(unique)) { unique = base + '-' + n; n++; }
+
+  const recipe = {
+    id: unique,
+    day: str(parsed.day) || 'Imported recipes',
+    title,
+    subtitle: str(parsed.subtitle) || (ingredients.length + ' ingredients'),
+    time: str(parsed.time) || '\u2014',
+    servings: parseInt(parsed.servings, 10) || 2,
+    tools: Array.isArray(parsed.tools) ? parsed.tools.map(str).filter(Boolean) : [],
+    ingredients,
+    steps
+  };
+
+  const list = loadUserRecipes();
+  list.push(recipe);
+  if (!saveUserRecipes(list)) {
+    return showImportError("Couldn't save \u2014 this device's storage may be full.");
+  }
 
   goToList();
   openRecipe(unique);
