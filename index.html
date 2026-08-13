@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<meta name="recipe-app-version" content="1.7.4" />
+<meta name="recipe-app-version" content="1.7.5" />
 <title>K.'s Recipes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1235,7 +1235,9 @@ async function sendToKrogerCart() {
       });
       const out = await res.json();
 
-      if (res.status === 401) {
+      // The Worker answers 200 and reports Kroger's status in the body, so an
+      // expired token arrives as out.status 401 rather than res.status 401.
+      if (res.status === 401 || out.status === 401) {
         try { localStorage.removeItem(KROGER_TOKEN_KEY); } catch (e) {}
         cartStatus('Kroger sign-in expired. Tap to sign in again.', true);
         refreshCartButton();
