@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<meta name="recipe-app-version" content="1.7.1" />
+<meta name="recipe-app-version" content="1.7.2" />
 <title>K.'s Recipes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -429,7 +429,12 @@
     </div>
   </div>
 
-  <!-- UPC PICKER SHEET -->
+  <!-- UPC PICKER SHEET — z-index must beat the Kroger sheet (50), since
+       the picker opens while that sheet is still on screen. -->
+  <style>
+    #picker-scrim { z-index: 60; }
+    #picker-sheet { z-index: 70; }
+  </style>
   <div class="scrim" id="picker-scrim" onclick="closePicker(false)"></div>
   <div class="sheet" id="picker-sheet">
     <div class="sheet-grip"></div>
