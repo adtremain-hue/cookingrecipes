@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<meta name="recipe-app-version" content="1.8.0" />
+<meta name="recipe-app-version" content="1.9.1" />
 <title>K.'s Recipes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -88,7 +88,6 @@
   /* ---------- COOK SCREEN ---------- */
   #screen-cook { background: #1C2321; color: #F4EFE4; cursor: pointer; user-select: none; }
   .cook-topbar { display: flex; align-items: center; justify-content: space-between; padding: 18px 16px 0; flex-shrink: 0; }
-  .cook-title { font-size: 12.5px; font-weight: 600; color: rgba(244,239,228,0.55); max-width: 55%; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .cook-step-count { font-size: 12.5px; font-weight: 700; color: #E8B339; font-variant-numeric: tabular-nums; min-width: 38px; text-align: right; }
   .cook-progress { display: flex; gap: 5px; padding: 16px 16px 0; flex-shrink: 0; }
   .progress-dot { flex: 1; height: 4px; border-radius: 3px; background: rgba(244,239,228,0.14); }
@@ -101,6 +100,54 @@
   .note-mark { display: block; font-family: 'Archivo Expanded', sans-serif; font-weight: 700; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; color: #E8B339; margin-bottom: 5px; }
   .cook-footer { flex-shrink: 0; padding: 0 30px 30px; text-align: center; }
   .tap-hint { font-size: 12px; font-weight: 600; color: rgba(244,239,228,0.4); letter-spacing: 0.02em; }
+
+  /* ---------- COOK TIMING (v1.9.0) ---------- */
+  .master-clock {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(244,239,228,0.08); border: none; border-radius: 20px;
+    padding: 7px 13px; cursor: pointer; font-family: inherit;
+    font-size: 13px; font-weight: 700; color: #F4EFE4; font-variant-numeric: tabular-nums;
+  }
+  .master-clock .mc-total { font-weight: 600; color: rgba(244,239,228,0.45); }
+  .master-clock.paused { background: rgba(232,179,57,0.18); color: #E8B339; }
+  .master-clock .mc-icon { font-size: 11px; }
+  .timer-strip {
+    display: flex; gap: 7px; padding: 12px 16px 0; flex-shrink: 0;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
+  .timer-strip:empty { display: none; }
+  .timer-chip {
+    display: flex; align-items: center; gap: 7px; flex-shrink: 0;
+    background: rgba(244,239,228,0.1); border: none; border-radius: 20px;
+    padding: 7px 12px; cursor: pointer; font-family: inherit;
+    font-size: 12.5px; font-weight: 700; color: #F4EFE4; font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .timer-chip .tc-label { font-weight: 600; color: rgba(244,239,228,0.6); max-width: 90px; overflow: hidden; text-overflow: ellipsis; }
+  .timer-chip.warn { background: rgba(232,179,57,0.22); }
+  .timer-chip.warn .tc-time { color: #E8B339; }
+  .timer-chip.done { background: #E8B339; color: #1C2321; animation: chipPulse 1s ease infinite; }
+  .timer-chip.done .tc-label { color: rgba(28,35,33,0.7); }
+  @keyframes chipPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+  .step-plan { font-size: 12px; font-weight: 600; color: rgba(244,239,228,0.45); margin: -8px 0 16px; }
+  .step-timer-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; border: 1.5px solid rgba(232,179,57,0.55); background: rgba(232,179,57,0.1);
+    color: #E8B339; font-family: 'Archivo Expanded', sans-serif; font-weight: 700; font-size: 14px;
+    padding: 14px; border-radius: 14px; cursor: pointer; margin: 0 0 20px;
+    font-variant-numeric: tabular-nums;
+  }
+  .step-timer-btn:active { background: rgba(232,179,57,0.2); }
+  .step-timer-btn.running { border-color: #E8B339; background: #E8B339; color: #1C2321; }
+  .step-timer-btn.finished { border-color: rgba(122,154,110,0.7); background: rgba(122,154,110,0.15); color: #A8C89C; }
+  .wake-badge {
+    display: inline-flex; align-items: center; gap: 5px; margin-bottom: 10px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
+    padding: 4px 10px; border-radius: 20px;
+  }
+  .wake-badge.on { background: rgba(122,154,110,0.16); color: #A8C89C; }
+  .wake-badge.off { background: rgba(244,239,228,0.08); color: rgba(244,239,228,0.45); }
+
 
   /* ---------- DONE SCREEN ---------- */
   #screen-done { background: #1C2321; color: #F4EFE4; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; cursor: pointer; }
@@ -373,20 +420,29 @@
   <div id="screen-cook" class="screen hidden" onclick="advanceStep()">
     <div class="cook-topbar">
       <button class="icon-btn on-dark" onclick="event.stopPropagation(); goBackStep()">&#8592;</button>
-      <div class="cook-title" id="cook-title"></div>
+      <button class="master-clock" id="master-clock" onclick="event.stopPropagation(); toggleMasterClock()">
+        <span class="mc-icon" id="mc-icon">&#9654;</span>
+        <span id="mc-elapsed">0:00</span>
+        <span class="mc-total" id="mc-total"></span>
+      </button>
       <div class="cook-step-count" id="cook-count"></div>
     </div>
     <div class="cook-progress" id="cook-progress"></div>
+    <div class="timer-strip" id="timer-strip"></div>
     <div class="cook-body">
       <div class="cook-step-label" id="cook-step-label"></div>
       <h1 class="cook-step-title" id="cook-step-title"></h1>
+      <div class="step-plan" id="cook-step-plan" style="display:none"></div>
       <p class="cook-step-text" id="cook-step-text"></p>
+      <button class="step-timer-btn" id="step-timer-btn" style="display:none"
+        onclick="event.stopPropagation(); tapStepTimer()"></button>
       <div class="cook-step-note" id="cook-step-note">
         <span class="note-mark">Tip</span>
         <span id="cook-step-note-text"></span>
       </div>
     </div>
     <div class="cook-footer">
+      <div class="wake-badge off" id="wake-badge" style="display:none"></div>
       <div class="tap-hint" id="cook-tap-hint">Tap anywhere to continue</div>
     </div>
   </div>
@@ -497,8 +553,8 @@
   "tools": ["Skillet", "Large pot"],
   "ingredients": ["Shrimp, 1 lb", "Spaghetti, 8 oz"],
   "steps": [
-    { "title": "Boil pasta", "body": "Cook to package time." },
-    { "title": "Sear shrimp", "body": "2 minutes per side.", "note": "Optional tip" }
+    { "title": "Boil pasta", "body": "Cook to package time.", "timerSeconds": 480, "approxSeconds": 480 },
+    { "title": "Sear shrimp", "body": "2 minutes per side.", "note": "Optional tip", "timerSeconds": 120, "approxSeconds": 300 }
   ]
 }'></textarea>
     </div>
@@ -1579,13 +1635,24 @@ function saveImportedRecipe() {
   }
 
   const str = v => (v == null ? '' : String(v).trim());
+  const posInt = v => { const n = parseInt(v, 10); return isFinite(n) && n > 0 ? n : 0; };
   const title = str(parsed.title);
   const ingredients = Array.isArray(parsed.ingredients)
     ? parsed.ingredients.map(str).filter(Boolean) : [];
   const steps = (Array.isArray(parsed.steps) ? parsed.steps : [])
-    .map(s => ({ title: str(s && s.title), body: str(s && s.body), note: str(s && s.note) }))
-    .filter(s => s.title || s.body)
-    .map(s => s.note ? s : { title: s.title, body: s.body });
+    .map(s => {
+      const out = { title: str(s && s.title), body: str(s && s.body) };
+      const note = str(s && s.note);
+      if (note) out.note = note;
+      // Timing fields (v1.9.0): timerSeconds drives the tap-to-start
+      // cook timer; approxSeconds feeds the master-clock schedule.
+      const t = posInt(s && s.timerSeconds);
+      const a = posInt(s && s.approxSeconds);
+      if (t) out.timerSeconds = t;
+      if (a) out.approxSeconds = a;
+      return out;
+    })
+    .filter(s => s.title || s.body);
 
   if (!title) return showImportError('The JSON needs a "title".');
   if (!ingredients.length) return showImportError('The JSON needs a non-empty "ingredients" array.');
@@ -1620,22 +1687,346 @@ function saveImportedRecipe() {
 }
 
 /* =================================================================
-   RENDER: COOK MODE
+   RENDER: COOK MODE + TIMING (v1.9.0)
+
+   Two clocks, deliberately different:
+   - MASTER CLOCK: the schedule. Counts up from "Start cooking",
+     pausable. Each step's approxSeconds gives a planned start mark
+     ("plan ~min 4") so you can see if you're ahead or behind.
+   - COOK TIMERS: physical processes (rice absorbing, beef searing).
+     Tap-to-start, anchored to real wall-clock time (Date.now), and
+     they NEVER pause — pausing the schedule doesn't pause the stove.
+     They keep counting across step changes and fire a chime + buzz
+     wherever you are in the recipe.
 ================================================================= */
+let cookSession = null; // { elapsedMs, running, lastTick, timers: {stepIdx: {label,endEpoch,durationMs,state}} }
+let cookInterval = null;
+let audioCtx = null;
+let wakeLock = null;
+
+function fmtClock(ms) {
+  const s = Math.max(0, Math.round(ms / 1000));
+  const m = Math.floor(s / 60);
+  return m + ':' + String(s % 60).padStart(2, '0');
+}
+
+function stepPlanOffsets() {
+  // Cumulative planned start time for each step, from approxSeconds.
+  // Steps without approxSeconds contribute 0 and show no plan line.
+  let acc = 0;
+  return activeRecipe.steps.map(s => {
+    const start = acc;
+    acc += (s.approxSeconds > 0 ? s.approxSeconds : 0);
+    return start;
+  });
+}
+
+function planTotalSeconds() {
+  return activeRecipe.steps.reduce((a, s) => a + (s.approxSeconds > 0 ? s.approxSeconds : 0), 0);
+}
+
 function startCooking() {
   stepIndex = 0;
+  cookSession = { elapsedMs: 0, running: true, lastTick: Date.now(), timers: {} };
+  if (cookInterval) clearInterval(cookInterval);
+  cookInterval = setInterval(cookTick, 250);
+  initAudio();
+  requestWakeLock();
   showScreen('screen-cook');
   renderStep();
 }
 
+function endCookSession() {
+  if (cookInterval) { clearInterval(cookInterval); cookInterval = null; }
+  cookSession = null;
+  releaseWakeLock();
+}
+
+function toggleMasterClock() {
+  if (!cookSession) return;
+  if (cookSession.running) {
+    cookSession.running = false;
+  } else {
+    cookSession.lastTick = Date.now();
+    cookSession.running = true;
+  }
+  renderClock();
+}
+
+function cookTick() {
+  if (!cookSession) return;
+  const now = Date.now();
+  if (cookSession.running) {
+    cookSession.elapsedMs += now - cookSession.lastTick;
+  }
+  cookSession.lastTick = now;
+
+  // Cook timers run on wall-clock endEpoch — immune to master pause
+  // and to the tab being backgrounded (recomputed on every tick).
+  Object.keys(cookSession.timers).forEach(k => {
+    const t = cookSession.timers[k];
+    if (t.state === 'running' && now >= t.endEpoch) {
+      t.state = 'done';
+      timerChime();
+      if (navigator.vibrate) navigator.vibrate([300, 120, 300, 120, 300]);
+    }
+  });
+
+  renderClock();
+  renderTimerStrip();
+  renderStepTimerBtn();
+}
+
+function renderClock() {
+  if (!cookSession || !activeRecipe) return;
+  const clockEl = document.getElementById('master-clock');
+  document.getElementById('mc-elapsed').textContent = fmtClock(cookSession.elapsedMs);
+  const total = planTotalSeconds();
+  document.getElementById('mc-total').textContent = total ? '/ ~' + fmtClock(total * 1000) : '';
+  document.getElementById('mc-icon').innerHTML = cookSession.running ? '&#10074;&#10074;' : '&#9654;';
+  clockEl.classList.toggle('paused', !cookSession.running);
+}
+
+function renderTimerStrip() {
+  if (!cookSession) return;
+  const strip = document.getElementById('timer-strip');
+  const now = Date.now();
+  const chips = Object.keys(cookSession.timers).map(k => {
+    const t = cookSession.timers[k];
+    if (t.state === 'dismissed') return '';
+    const remain = t.endEpoch - now;
+    if (t.state === 'done') {
+      return `<button class="timer-chip done" onclick="event.stopPropagation(); dismissTimer(${k})">
+        <span class="tc-label">${esc(t.label)}</span><span class="tc-time">Done &#10003;</span></button>`;
+    }
+    const warn = remain <= 30000 ? ' warn' : '';
+    return `<button class="timer-chip${warn}" onclick="event.stopPropagation(); goToStep(${k})">
+      <span class="tc-label">${esc(t.label)}</span><span class="tc-time">${fmtClock(remain)}</span></button>`;
+  }).join('');
+  if (strip.innerHTML !== chips) strip.innerHTML = chips;
+}
+
+function dismissTimer(stepIdx) {
+  if (!cookSession || !cookSession.timers[stepIdx]) return;
+  cookSession.timers[stepIdx].state = 'dismissed';
+  renderTimerStrip();
+  renderStepTimerBtn();
+}
+
+function goToStep(i) {
+  if (i >= 0 && i < activeRecipe.steps.length) {
+    stepIndex = i;
+    renderStep();
+  }
+}
+
+function tapStepTimer() {
+  if (!cookSession) return;
+  const step = activeRecipe.steps[stepIndex];
+  const existing = cookSession.timers[stepIndex];
+  if (existing && existing.state === 'running') {
+    // Tap while running = reset to full. Long chance of a mis-tap is
+    // low; resetting is the thing you actually want mid-cook.
+    existing.endEpoch = Date.now() + existing.durationMs;
+    renderStepTimerBtn();
+    return;
+  }
+  if (existing && existing.state === 'done') {
+    dismissTimer(stepIndex);
+    return;
+  }
+  if (!(step.timerSeconds > 0)) return;
+  initAudio();
+  cookSession.timers[stepIndex] = {
+    label: step.title,
+    durationMs: step.timerSeconds * 1000,
+    endEpoch: Date.now() + step.timerSeconds * 1000,
+    state: 'running'
+  };
+  renderStepTimerBtn();
+  renderTimerStrip();
+}
+
+function renderStepTimerBtn() {
+  const btn = document.getElementById('step-timer-btn');
+  if (!btn || !activeRecipe) return;
+  const step = activeRecipe.steps[stepIndex];
+  if (!cookSession || !(step && step.timerSeconds > 0)) { btn.style.display = 'none'; return; }
+  btn.style.display = 'flex';
+  const t = cookSession.timers[stepIndex];
+  if (!t || t.state === 'dismissed') {
+    btn.className = 'step-timer-btn';
+    btn.innerHTML = '&#9202; Start timer &middot; ' + fmtClock(step.timerSeconds * 1000);
+  } else if (t.state === 'running') {
+    btn.className = 'step-timer-btn running';
+    btn.innerHTML = '&#9202; ' + fmtClock(t.endEpoch - Date.now()) + ' &middot; tap to reset';
+  } else if (t.state === 'done') {
+    btn.className = 'step-timer-btn finished';
+    btn.innerHTML = '&#10003; Timer done &middot; tap to clear';
+  }
+}
+
+/* ---- chime + wake lock ---- */
+function initAudio() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  } catch (e) { /* no audio; vibration still fires */ }
+}
+
+function timerChime() {
+  if (!audioCtx) return;
+  try {
+    const now = audioCtx.currentTime;
+    [0, 0.35, 0.7].forEach(off => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, now + off);
+      osc.frequency.setValueAtTime(1174.66, now + off + 0.12);
+      gain.gain.setValueAtTime(0.0001, now + off);
+      gain.gain.exponentialRampToValueAtTime(0.4, now + off + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + off + 0.3);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(now + off);
+      osc.stop(now + off + 0.32);
+    });
+  } catch (e) { /* ignore */ }
+}
+
+/* ---- KEEP AWAKE (v1.9.1) ------------------------------------
+   Three layers, because no single one is reliable on a phone:
+
+   1. Screen Wake Lock API (iOS 16.4+, Android Chrome). The real
+      mechanism. But the OS silently drops it on backgrounding, on
+      a phone call, and sometimes on low-power mode -- so we listen
+      for its 'release' event and immediately re-acquire.
+   2. A 64x64 muted looping video, played inline. Older iOS treats
+      active video playback as "user is watching" and won't sleep.
+      Belt and braces on devices where layer 1 is missing or drops.
+   3. A re-acquire on every tap and on returning to the foreground,
+      so even if both above lapse, the next interaction restores it.
+
+   wakeStatus is surfaced in the UI so you can SEE whether the
+   screen is actually being held awake instead of guessing.
+--------------------------------------------------------------- */
+const KEEPAWAKE_MP4 = 'data:video/mp4;base64,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';
+let keepAwakeVideo = null;
+let wakeStatus = 'off';   // 'held' | 'video' | 'off'
+
+function ensureKeepAwakeVideo() {
+  if (keepAwakeVideo) return keepAwakeVideo;
+  const v = document.createElement('video');
+  v.setAttribute('playsinline', '');
+  v.setAttribute('webkit-playsinline', '');
+  v.setAttribute('muted', '');
+  v.setAttribute('loop', '');
+  v.muted = true;
+  v.loop = true;
+  v.src = KEEPAWAKE_MP4;
+  // Must be in the document and non-zero size, or iOS ignores it.
+  v.style.cssText = 'position:fixed;width:2px;height:2px;bottom:0;right:0;opacity:0.01;pointer-events:none;z-index:-1';
+  document.body.appendChild(v);
+  keepAwakeVideo = v;
+  return v;
+}
+
+function startKeepAwakeVideo() {
+  try {
+    const v = ensureKeepAwakeVideo();
+    const p = v.play();
+    if (p && p.then) {
+      p.then(() => { if (wakeStatus !== 'held') { wakeStatus = 'video'; renderWakeBadge(); } })
+       .catch(() => { /* autoplay blocked until a gesture; retried on next tap */ });
+    }
+  } catch (e) {}
+}
+
+function stopKeepAwakeVideo() {
+  try { if (keepAwakeVideo) { keepAwakeVideo.pause(); } } catch (e) {}
+}
+
+async function requestWakeLock() {
+  if (!cookSession) return;
+  try {
+    if ('wakeLock' in navigator) {
+      if (wakeLock) return;                      // already held
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeStatus = 'held';
+      renderWakeBadge();
+      // The OS drops this on background/call. Take it straight back
+      // if we're still cooking.
+      wakeLock.addEventListener('release', () => {
+        wakeLock = null;
+        if (cookSession) {
+          wakeStatus = 'off';
+          renderWakeBadge();
+          if (document.visibilityState === 'visible') requestWakeLock();
+        }
+      });
+    }
+  } catch (e) {
+    wakeLock = null;
+    if (wakeStatus === 'held') wakeStatus = 'off';
+    renderWakeBadge();
+  }
+  // Video layer runs alongside, not instead of.
+  startKeepAwakeVideo();
+}
+
+function releaseWakeLock() {
+  try { if (wakeLock) { wakeLock.release(); wakeLock = null; } } catch (e) {}
+  stopKeepAwakeVideo();
+  wakeStatus = 'off';
+  renderWakeBadge();
+}
+
+function renderWakeBadge() {
+  const el = document.getElementById('wake-badge');
+  if (!el) return;
+  if (!cookSession) { el.style.display = 'none'; return; }
+  el.style.display = 'inline-flex';
+  if (wakeStatus === 'held' || wakeStatus === 'video') {
+    el.className = 'wake-badge on';
+    el.innerHTML = '&#128161; Screen staying on';
+  } else {
+    el.className = 'wake-badge off';
+    el.innerHTML = '&#128161; Tap to keep screen on';
+  }
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && cookSession) {
+    requestWakeLock();
+    // Timers are wall-clock based, so catch up immediately rather
+    // than waiting up to 250ms for the next interval tick.
+    cookTick();
+  }
+});
+
+// Every tap in cook mode is a free chance to restore a lapsed lock.
+document.addEventListener('click', () => {
+  if (cookSession && wakeStatus !== 'held') requestWakeLock();
+}, true);
+
 function renderStep() {
   const total = activeRecipe.steps.length;
   const step = activeRecipe.steps[stepIndex];
-  document.getElementById('cook-title').textContent = activeRecipe.title;
   document.getElementById('cook-count').textContent = (stepIndex + 1) + ' / ' + total;
   document.getElementById('cook-step-label').textContent = 'Step ' + (stepIndex + 1);
   document.getElementById('cook-step-title').textContent = step.title;
   document.getElementById('cook-step-text').textContent = step.body;
+
+  // Planned start mark from approxSeconds schedule
+  const planEl = document.getElementById('cook-step-plan');
+  const offsets = stepPlanOffsets();
+  if (step.approxSeconds > 0 && planTotalSeconds() > 0) {
+    const startMin = Math.round(offsets[stepIndex] / 60);
+    planEl.textContent = '\u2248 ' + fmtClock(step.approxSeconds * 1000) + ' \u00b7 plan: start ~min ' + startMin;
+    planEl.style.display = 'block';
+  } else {
+    planEl.style.display = 'none';
+  }
 
   const noteEl = document.getElementById('cook-step-note');
   if (step.note) {
@@ -1652,6 +2043,9 @@ function renderStep() {
   document.getElementById('cook-tap-hint').textContent =
     (stepIndex === total - 1) ? 'Tap to finish' : 'Tap anywhere to continue';
 
+  renderClock();
+  renderTimerStrip();
+  renderStepTimerBtn();
   document.getElementById('screen-cook').scrollTop = 0;
 }
 
@@ -1670,12 +2064,21 @@ function goBackStep() {
     stepIndex--;
     renderStep();
   } else {
+    // Back to overview keeps the session alive — timers and the
+    // master clock survive a glance at the ingredient list. A fresh
+    // "Start cooking" resets everything.
     showScreen('screen-overview');
   }
 }
 
 function finishCooking() {
-  document.getElementById('done-text').textContent = activeRecipe.title + ' \u2014 done.';
+  const running = cookSession && Object.keys(cookSession.timers)
+    .some(k => cookSession.timers[k].state === 'running');
+  if (running && !confirm('A timer is still running. Finish anyway?')) return;
+  const took = cookSession ? fmtClock(cookSession.elapsedMs) : null;
+  endCookSession();
+  document.getElementById('done-text').textContent =
+    activeRecipe.title + ' \u2014 done' + (took ? ' in ' + took : '') + '.';
   showScreen('screen-done');
 }
 
