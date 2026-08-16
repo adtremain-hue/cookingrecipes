@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<meta name="recipe-app-version" content="1.9.1" />
+<meta name="recipe-app-version" content="1.10.0" />
 <title>K.'s Recipes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -112,8 +112,7 @@
   .master-clock.paused { background: rgba(232,179,57,0.18); color: #E8B339; }
   .master-clock .mc-icon { font-size: 11px; }
   .timer-strip {
-    display: flex; gap: 7px; padding: 12px 16px 0; flex-shrink: 0;
-    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    display: flex; flex-wrap: wrap; gap: 7px; padding: 12px 16px 0; flex-shrink: 0;
   }
   .timer-strip:empty { display: none; }
   .timer-chip {
@@ -128,6 +127,13 @@
   .timer-chip.warn .tc-time { color: #E8B339; }
   .timer-chip.done { background: #E8B339; color: #1C2321; animation: chipPulse 1s ease infinite; }
   .timer-chip.done .tc-label { color: rgba(28,35,33,0.7); }
+  .timer-chip.held { background: rgba(244,239,228,0.06); opacity: 0.72; }
+  .timer-chip.held .tc-time { color: rgba(244,239,228,0.75); }
+  .clock-note {
+    padding: 8px 16px 0; font-size: 11.5px; font-weight: 600;
+    color: #E8B339; letter-spacing: 0.01em;
+  }
+  .clock-note:empty { display: none; }
   @keyframes chipPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
   .step-plan { font-size: 12px; font-weight: 600; color: rgba(244,239,228,0.45); margin: -8px 0 16px; }
   .step-timer-btn {
@@ -140,6 +146,20 @@
   .step-timer-btn:active { background: rgba(232,179,57,0.2); }
   .step-timer-btn.running { border-color: #E8B339; background: #E8B339; color: #1C2321; }
   .step-timer-btn.finished { border-color: rgba(122,154,110,0.7); background: rgba(122,154,110,0.15); color: #A8C89C; }
+  .step-timer-btn.held { border-color: rgba(232,179,57,0.45); background: rgba(244,239,228,0.05); color: rgba(232,179,57,0.85); }
+
+  /* ---------- IMPORT: file picker ---------- */
+  .import-file-btn {
+    width: 100%; border: 1.5px dashed #DDD3BC; background: none; border-radius: 12px;
+    padding: 15px; font-family: inherit; font-weight: 700; font-size: 14px;
+    color: #8A7F68; cursor: pointer; margin-bottom: 14px;
+  }
+  .import-file-btn:active { background: #F4EEE0; }
+  .import-file-btn.loaded { border-style: solid; border-color: #7A9A6E; color: #5F7D55; }
+  .import-or {
+    text-align: center; font-size: 11.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: #C0B7A0; margin-bottom: 12px;
+  }
   .wake-badge {
     display: inline-flex; align-items: center; gap: 5px; margin-bottom: 10px;
     font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
@@ -154,6 +174,11 @@
   .done-mark { width: 64px; height: 64px; border-radius: 50%; background: #E8B339; color: #1C2321; display: flex; align-items: center; justify-content: center; margin-bottom: 22px; font-size: 30px; font-weight: 700; }
   #screen-done h1 { font-family: 'Archivo Expanded', sans-serif; font-weight: 800; font-size: 28px; margin: 0 0 8px; }
   #screen-done p { font-size: 15px; color: rgba(244,239,228,0.65); font-weight: 500; margin: 0 0 40px; }
+  #screen-done .done-timing {
+    font-size: 13.5px; color: rgba(244,239,228,0.5); margin: -30px 0 40px;
+    font-variant-numeric: tabular-nums;
+  }
+  #screen-done .done-timing b { color: #E8B339; font-weight: 700; }
 
 
   /* ---------- UPC PICKER ---------- */
@@ -167,6 +192,22 @@
   .pick-name { display: block; font-size: 14.5px; font-weight: 600; color: #1C2321; line-height: 1.3; }
   .pick-meta { display: block; font-size: 11.5px; font-weight: 500; color: #A8A08C; margin-top: 2px; }
   .pick-skip .pick-name { color: #A8A08C; font-weight: 500; }
+  .pick-img {
+    flex-shrink: 0; width: 46px; height: 46px; border-radius: 9px;
+    object-fit: contain; background: #F4EEE0; display: block;
+  }
+  .pick-img.broken { background: #F0EADB; }
+  .pick-img.blank { background: none; }
+  .pick-price {
+    flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end;
+    font-size: 14px; font-weight: 700; color: #1C2321; font-variant-numeric: tabular-nums;
+  }
+  .pick-price.sale { color: #A34A2E; }
+  .pick-was { font-size: 11px; font-weight: 600; color: #A8A08C; text-decoration: line-through; margin-top: 2px; }
+  .picker-note {
+    font-size: 12px; font-weight: 600; color: #A8A08C; background: #F7F2E6;
+    border-radius: 10px; padding: 10px 12px; margin: 6px 4px 4px;
+  }
   .pick-prev {
     display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
     text-transform: uppercase; color: #B5793A; background: #F4E9D2;
@@ -429,6 +470,7 @@
     </div>
     <div class="cook-progress" id="cook-progress"></div>
     <div class="timer-strip" id="timer-strip"></div>
+    <div class="clock-note" id="clock-note"></div>
     <div class="cook-body">
       <div class="cook-step-label" id="cook-step-label"></div>
       <h1 class="cook-step-title" id="cook-step-title"></h1>
@@ -452,6 +494,7 @@
     <div class="done-mark">&#10003;</div>
     <h1>Order up.</h1>
     <p id="done-text"></p>
+    <p class="done-timing" id="done-timing" style="display:none"></p>
     <div class="tap-hint">Tap to go back to recipes</div>
   </div>
 
@@ -542,8 +585,17 @@
       <div class="add-error" id="import-error"></div>
       <p class="import-intro">
         Send Claude a recipe link or PDF in chat and ask for it as JSON for this app.
-        Paste the result below &mdash; it saves to <b>this device</b>, same as a recipe you add by hand.
+        Load a saved <b>.json</b> file or paste it below &mdash; either way it saves to
+        <b>this device</b>, same as a recipe you add by hand.
       </p>
+      <!-- No accept="" on purpose: iOS greys out .json files in the Files
+           app often enough that filtering costs more than it saves. Anything
+           that isn't JSON fails in the validator below with a clear message. -->
+      <input type="file" id="import-file" style="display:none" onchange="loadImportFile(this)">
+      <button class="import-file-btn" onclick="document.getElementById('import-file').click()">
+        &#128193; Choose a .json file
+      </button>
+      <div class="import-or">or paste it</div>
       <textarea class="import-textarea" id="import-json" spellcheck="false" autocapitalize="off" autocorrect="off" placeholder='{
   "title": "Garlic Butter Shrimp Pasta",
   "subtitle": "Weeknight pasta, dairy-free",
@@ -1059,7 +1111,11 @@ function lookupEntry(term) {
 }
 
 function storeEntry(term, entry) {
-  upcCache[canonicalTerm(term)] = Object.assign({}, entry, { checkedAt: new Date().toISOString() });
+  // Price is deliberately NOT cached. A figure stored weeks ago would
+  // render identically to a live one with no way to tell them apart.
+  // Image URLs are stable, so those persist.
+  const { price, wasPrice, ...keep } = entry;
+  upcCache[canonicalTerm(term)] = Object.assign({}, keep, { checkedAt: new Date().toISOString() });
   saveUpcCache();
 }
 
@@ -1128,12 +1184,37 @@ async function searchKroger(query) {
 
 function productToEntry(p) {
   const item = (p.items && p.items[0]) || {};
+  const price = item.price || {};
+  const regular = typeof price.regular === 'number' ? price.regular : null;
+  const promo = (typeof price.promo === 'number' && price.promo > 0) ? price.promo : null;
+  const onSale = promo != null && regular != null && promo < regular;
   return {
     upc: p.upc,
     product: p.description || '',
     brand: p.brand || '',
-    size: item.size || ''
+    size: item.size || '',
+    image: pickImage(p),
+    price: onSale ? promo : regular,
+    wasPrice: onSale ? regular : null
   };
+}
+
+/* Kroger returns several perspectives and sizes per product. Prefer the
+   front-facing shot at medium (~200px), which is crisp on retina at the
+   46px we draw it. Returns '' when nothing usable is present. */
+function pickImage(p) {
+  const imgs = Array.isArray(p.images) ? p.images : [];
+  const pref = imgs.find(i => i.perspective === 'front' && i.featured) ||
+               imgs.find(i => i.perspective === 'front') || imgs[0];
+  if (!pref || !Array.isArray(pref.sizes)) return '';
+  const size = pref.sizes.find(z => z.size === 'medium') ||
+               pref.sizes.find(z => z.size === 'large') ||
+               pref.sizes.find(z => z.size === 'thumbnail') || pref.sizes[0];
+  return (size && size.url) || '';
+}
+
+function fmtPrice(v) {
+  return (typeof v === 'number' && v > 0) ? '$' + v.toFixed(2) : '';
 }
 
 /* Returns one of:
@@ -1209,16 +1290,30 @@ function renderPicker() {
   document.getElementById('picker-count').textContent =
     pickerQueue.length + ' left';
 
-  document.getElementById('picker-body').innerHTML = current.options.map((o, i) => `
+  // Kroger only returns a price object when the search carries a
+  // filter.locationId. Until the Worker sends one, every price is null —
+  // so say that plainly instead of rendering rows that look broken.
+  const anyPrice = current.options.some(o => typeof o.price === 'number' && o.price > 0);
+  const noteHtml = anyPrice ? '' :
+    '<div class="picker-note">Prices need a store set on the Worker \u2014 showing products only.</div>';
+
+  document.getElementById('picker-body').innerHTML = noteHtml + current.options.map((o, i) => `
     <button class="pick-row" onclick="choosePick(${i})">
+      ${o.image
+        ? `<img class="pick-img" src="${esc(o.image)}" alt="" loading="lazy" onerror="this.classList.add('broken')">`
+        : `<span class="pick-img broken"></span>`}
       <span class="pick-text">
         <span class="pick-name">${esc(o.product)}${o.previously ? '<span class="pick-prev">Previously bought</span>' : ''}</span>
         <span class="pick-meta">${esc([o.brand, o.size].filter(Boolean).join(' \u00b7 '))}</span>
       </span>
-      <span class="shop-go">&#8250;</span>
+      ${typeof o.price === 'number' && o.price > 0
+        ? `<span class="pick-price${o.wasPrice ? ' sale' : ''}">${fmtPrice(o.price)}${
+            o.wasPrice ? `<span class="pick-was">${fmtPrice(o.wasPrice)}</span>` : ''}</span>`
+        : `<span class="shop-go">&#8250;</span>`}
     </button>
   `).join('') + `
     <button class="pick-row pick-skip" onclick="choosePick(-1)">
+      <span class="pick-img blank"></span>
       <span class="pick-text"><span class="pick-name">Skip this one</span>
       <span class="pick-meta">Leave it off the cart</span></span>
     </button>`;
@@ -1601,12 +1696,32 @@ function saveRecipe() {
 function openImportRecipe() {
   document.getElementById('import-json').value = '';
   document.getElementById('import-error').classList.remove('show');
+  const fb = document.querySelector('.import-file-btn');
+  if (fb) { fb.classList.remove('loaded'); fb.innerHTML = '&#128193; Choose a .json file'; }
   showScreen('screen-import');
   document.getElementById('screen-import').scrollTop = 0;
 }
 
 function cancelImportRecipe() {
   goToList();
+}
+
+/* Reads a picked file into the same textarea the paste path uses, so
+   there is exactly one validator and one set of error messages. */
+function loadImportFile(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const btn = document.querySelector('.import-file-btn');
+  const reader = new FileReader();
+  reader.onload = () => {
+    document.getElementById('import-json').value = String(reader.result || '');
+    document.getElementById('import-error').classList.remove('show');
+    btn.classList.add('loaded');
+    btn.innerHTML = '&#10003; ' + esc(file.name) + ' \u2014 tap Import to save';
+  };
+  reader.onerror = () => showImportError("Couldn't read that file \u2014 try pasting the JSON instead.");
+  reader.readAsText(file);
+  input.value = '';   // so re-picking the same file fires change again
 }
 
 function showImportError(msg) {
@@ -1710,6 +1825,13 @@ function fmtClock(ms) {
   return m + ':' + String(s % 60).padStart(2, '0');
 }
 
+function fmtLong(ms) {
+  const s = Math.max(0, Math.round(ms / 1000));
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+  const pad = v => String(v).padStart(2, '0');
+  return h ? h + ':' + pad(m) + ':' + pad(s % 60) : m + ':' + pad(s % 60);
+}
+
 function stepPlanOffsets() {
   // Cumulative planned start time for each step, from approxSeconds.
   // Steps without approxSeconds contribute 0 and show no plan line.
@@ -1727,7 +1849,7 @@ function planTotalSeconds() {
 
 function startCooking() {
   stepIndex = 0;
-  cookSession = { elapsedMs: 0, running: true, lastTick: Date.now(), timers: {} };
+  cookSession = { elapsedMs: 0, running: true, lastTick: Date.now(), startedAt: Date.now(), timers: {} };
   if (cookInterval) clearInterval(cookInterval);
   cookInterval = setInterval(cookTick, 250);
   initAudio();
@@ -1785,6 +1907,17 @@ function renderClock() {
   document.getElementById('mc-total').textContent = total ? '/ ~' + fmtClock(total * 1000) : '';
   document.getElementById('mc-icon').innerHTML = cookSession.running ? '&#10074;&#10074;' : '&#9654;';
   clockEl.classList.toggle('paused', !cookSession.running);
+
+  // Pausing the clock is a claim about your schedule, not about the food.
+  // Step timers keep running through it, so say so rather than let a
+  // paused clock imply the stove stopped too.
+  const live = Object.keys(cookSession.timers)
+    .filter(k => cookSession.timers[k].state === 'running').length;
+  const note = document.getElementById('clock-note');
+  const txt = (!cookSession.running && live)
+    ? 'Clock paused \u00b7 ' + live + ' timer' + (live === 1 ? '' : 's') + ' still running'
+    : '';
+  if (note.textContent !== txt) note.textContent = txt;
 }
 
 function renderTimerStrip() {
@@ -1794,6 +1927,10 @@ function renderTimerStrip() {
   const chips = Object.keys(cookSession.timers).map(k => {
     const t = cookSession.timers[k];
     if (t.state === 'dismissed') return '';
+    if (t.state === 'paused') {
+      return `<button class="timer-chip held" onclick="event.stopPropagation(); goToStep(${k})">
+        <span class="tc-label">${esc(t.label)}</span><span class="tc-time">&#10074;&#10074; ${fmtClock(t.remainMs)}</span></button>`;
+    }
     const remain = t.endEpoch - now;
     if (t.state === 'done') {
       return `<button class="timer-chip done" onclick="event.stopPropagation(); dismissTimer(${k})">
@@ -1821,30 +1958,67 @@ function goToStep(i) {
 }
 
 function tapStepTimer() {
+  // Long-press already handled this touch as a reset — swallow the click.
+  if (longPressFired) { longPressFired = false; return; }
   if (!cookSession) return;
   const step = activeRecipe.steps[stepIndex];
-  const existing = cookSession.timers[stepIndex];
-  if (existing && existing.state === 'running') {
-    // Tap while running = reset to full. Long chance of a mis-tap is
-    // low; resetting is the thing you actually want mid-cook.
-    existing.endEpoch = Date.now() + existing.durationMs;
-    renderStepTimerBtn();
-    return;
-  }
-  if (existing && existing.state === 'done') {
+  const t = cookSession.timers[stepIndex];
+  const now = Date.now();
+
+  if (t && t.state === 'running') {          // tap while running = pause
+    t.remainMs = Math.max(0, t.endEpoch - now);
+    t.state = 'paused';
+  } else if (t && t.state === 'paused') {    // tap while paused = resume
+    t.endEpoch = now + t.remainMs;
+    t.state = 'running';
+  } else if (t && t.state === 'done') {      // tap when finished = clear
     dismissTimer(stepIndex);
     return;
+  } else {                                   // no live timer = start one
+    if (!(step.timerSeconds > 0)) return;
+    initAudio();
+    cookSession.timers[stepIndex] = {
+      label: step.title,
+      durationMs: step.timerSeconds * 1000,
+      endEpoch: now + step.timerSeconds * 1000,
+      remainMs: step.timerSeconds * 1000,
+      state: 'running'
+    };
   }
-  if (!(step.timerSeconds > 0)) return;
-  initAudio();
-  cookSession.timers[stepIndex] = {
-    label: step.title,
-    durationMs: step.timerSeconds * 1000,
-    endEpoch: Date.now() + step.timerSeconds * 1000,
-    state: 'running'
-  };
   renderStepTimerBtn();
   renderTimerStrip();
+}
+
+/* Long-press = reset. Returns the timer to its full duration and to an
+   idle state, so it stays put until you deliberately start it again.
+   This is the action v1.9.1 had no way to express: previously a tap on
+   a running timer reset it, which meant there was no way to stop one. */
+function resetStepTimer() {
+  if (!cookSession) return;
+  const step = activeRecipe.steps[stepIndex];
+  if (!(step && step.timerSeconds > 0)) return;
+  delete cookSession.timers[stepIndex];
+  if (navigator.vibrate) navigator.vibrate(40);
+  renderStepTimerBtn();
+  renderTimerStrip();
+}
+
+let longPressTimer = null;
+let longPressFired = false;
+
+function bindStepTimerLongPress() {
+  const btn = document.getElementById('step-timer-btn');
+  if (!btn) return;
+  const begin = () => {
+    longPressFired = false;
+    clearTimeout(longPressTimer);
+    longPressTimer = setTimeout(() => { longPressFired = true; resetStepTimer(); }, 500);
+  };
+  const cancel = () => clearTimeout(longPressTimer);
+  btn.addEventListener('touchstart', begin, { passive: true });
+  ['touchend', 'touchcancel', 'touchmove'].forEach(e => btn.addEventListener(e, cancel));
+  btn.addEventListener('mousedown', begin);
+  ['mouseup', 'mouseleave'].forEach(e => btn.addEventListener(e, cancel));
 }
 
 function renderStepTimerBtn() {
@@ -1859,7 +2033,10 @@ function renderStepTimerBtn() {
     btn.innerHTML = '&#9202; Start timer &middot; ' + fmtClock(step.timerSeconds * 1000);
   } else if (t.state === 'running') {
     btn.className = 'step-timer-btn running';
-    btn.innerHTML = '&#9202; ' + fmtClock(t.endEpoch - Date.now()) + ' &middot; tap to reset';
+    btn.innerHTML = '&#9202; ' + fmtClock(t.endEpoch - Date.now()) + ' &middot; tap to pause';
+  } else if (t.state === 'paused') {
+    btn.className = 'step-timer-btn held';
+    btn.innerHTML = '&#10074;&#10074; ' + fmtClock(t.remainMs) + ' &middot; tap to resume, hold to reset';
   } else if (t.state === 'done') {
     btn.className = 'step-timer-btn finished';
     btn.innerHTML = '&#10003; Timer done &middot; tap to clear';
@@ -2075,10 +2252,27 @@ function finishCooking() {
   const running = cookSession && Object.keys(cookSession.timers)
     .some(k => cookSession.timers[k].state === 'running');
   if (running && !confirm('A timer is still running. Finish anyway?')) return;
-  const took = cookSession ? fmtClock(cookSession.elapsedMs) : null;
+
+  // Two numbers, and the honest one leads. Real elapsed is wall-clock
+  // from "Start cooking" to now, pauses included — what it actually
+  // cost you tonight. Active is the schedule clock minus time paused.
+  let realMs = null, activeMs = null;
+  if (cookSession) {
+    realMs = Date.now() - cookSession.startedAt;
+    activeMs = cookSession.elapsedMs;
+  }
   endCookSession();
-  document.getElementById('done-text').textContent =
-    activeRecipe.title + ' \u2014 done' + (took ? ' in ' + took : '') + '.';
+
+  document.getElementById('done-text').textContent = activeRecipe.title + ' \u2014 done.';
+  const sub = document.getElementById('done-timing');
+  if (realMs != null) {
+    const paused = realMs - activeMs;
+    sub.innerHTML = 'Took <b>' + fmtLong(realMs) + '</b> start to finish' +
+      (paused > 45000 ? ' \u00b7 ' + fmtLong(activeMs) + ' of it hands-on' : '');
+    sub.style.display = 'block';
+  } else {
+    sub.style.display = 'none';
+  }
   showScreen('screen-done');
 }
 
@@ -2086,12 +2280,19 @@ function finishCooking() {
    SCREEN SWITCHING
 ================================================================= */
 function showScreen(id) {
+  // Both sheets live outside .screen, so hiding screens leaves them on
+  // top of whatever you navigate to. An abandoned picker (backed out of
+  // a cart build, or a token that expired mid-pick) used to stay pinned
+  // over every later screen at z-index 70, swallowing taps — which read
+  // as the app freezing and needing a restart.
   closeKroger();
+  closePicker(false);
   document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
 }
 
 document.getElementById('welcome-skip-btn').classList.toggle('checked', localStorage.getItem(SKIP_WELCOME_KEY) === '1');
+bindStepTimerLongPress();
 readTokenFromHash();
 loadUpcCache();
 loadUpcFile();
