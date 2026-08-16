@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<meta name="recipe-app-version" content="1.10.0" />
+<meta name="recipe-app-version" content="1.10.1" />
 <title>K.'s Recipes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -160,6 +160,18 @@
     text-align: center; font-size: 11.5px; font-weight: 700; text-transform: uppercase;
     letter-spacing: 0.08em; color: #C0B7A0; margin-bottom: 12px;
   }
+  .topbar-spacer { width: 38px; flex-shrink: 0; }
+  .import-go {
+    width: 100%; border: none; background: #1C2321; color: #F4EFE4;
+    font-family: 'Archivo Expanded', sans-serif; font-weight: 800; font-size: 15px;
+    padding: 16px; border-radius: 14px; cursor: pointer; margin-top: 16px;
+  }
+  .import-go:active:not(:disabled) { opacity: 0.8; }
+  .import-go:disabled { background: #EFE8D8; color: #B8AF98; cursor: default; }
+  .import-hint {
+    text-align: center; font-size: 12px; font-weight: 500; color: #A8A08C; margin-top: 10px;
+  }
+  .import-hint.ready { color: #5F7D55; font-weight: 600; }
   .wake-badge {
     display: inline-flex; align-items: center; gap: 5px; margin-bottom: 10px;
     font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
@@ -579,7 +591,7 @@
     <div class="add-topbar">
       <button class="icon-btn" onclick="cancelImportRecipe()">&#8592;</button>
       <h2>Import a recipe</h2>
-      <button class="add-save-btn" onclick="saveImportedRecipe()">Import</button>
+      <span class="topbar-spacer"></span>
     </div>
     <div class="import-body">
       <div class="add-error" id="import-error"></div>
@@ -608,7 +620,9 @@
     { "title": "Boil pasta", "body": "Cook to package time.", "timerSeconds": 480, "approxSeconds": 480 },
     { "title": "Sear shrimp", "body": "2 minutes per side.", "note": "Optional tip", "timerSeconds": 120, "approxSeconds": 300 }
   ]
-}'></textarea>
+}' oninput="refreshImportBtn()"></textarea>
+      <button class="import-go" id="import-go" disabled onclick="saveImportedRecipe()">Import</button>
+      <div class="import-hint" id="import-hint">Choose a file or paste JSON above to enable this.</div>
     </div>
   </div>
 
@@ -1698,12 +1712,24 @@ function openImportRecipe() {
   document.getElementById('import-error').classList.remove('show');
   const fb = document.querySelector('.import-file-btn');
   if (fb) { fb.classList.remove('loaded'); fb.innerHTML = '&#128193; Choose a .json file'; }
+  refreshImportBtn();
   showScreen('screen-import');
   document.getElementById('screen-import').scrollTop = 0;
 }
 
 function cancelImportRecipe() {
   goToList();
+}
+
+/* The Import button is disabled until there is actually something to
+   import, so the empty-input path can't be reached by tapping at all. */
+function refreshImportBtn() {
+  const has = document.getElementById('import-json').value.trim().length > 0;
+  const btn = document.getElementById('import-go');
+  const hint = document.getElementById('import-hint');
+  btn.disabled = !has;
+  hint.textContent = has ? 'Ready to import.' : 'Choose a file or paste JSON above to enable this.';
+  hint.classList.toggle('ready', has);
 }
 
 /* Reads a picked file into the same textarea the paste path uses, so
@@ -1717,7 +1743,8 @@ function loadImportFile(input) {
     document.getElementById('import-json').value = String(reader.result || '');
     document.getElementById('import-error').classList.remove('show');
     btn.classList.add('loaded');
-    btn.innerHTML = '&#10003; ' + esc(file.name) + ' \u2014 tap Import to save';
+    btn.innerHTML = '&#10003; ' + esc(file.name) + ' \u2014 tap Import below to save';
+    refreshImportBtn();
   };
   reader.onerror = () => showImportError("Couldn't read that file \u2014 try pasting the JSON instead.");
   reader.readAsText(file);
@@ -1728,7 +1755,10 @@ function showImportError(msg) {
   const el = document.getElementById('import-error');
   el.textContent = msg;
   el.classList.add('show');
-  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Deliberately not scrollIntoView({behavior:'smooth'}): inside an
+  // absolutely-positioned flex screen, iOS WebKit can wedge on it.
+  const body = el.closest('.import-body');
+  if (body) body.scrollTop = 0;
 }
 
 function saveImportedRecipe() {
